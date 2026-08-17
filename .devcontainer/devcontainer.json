@@ -2,10 +2,10 @@
   "name": "Tulips Dev",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {}
+    "ghcr.io/devcontainers-extra/features/bun:1": {}
   },
   "forwardPorts": [3000],
-  "postCreateCommand": "npm install",
+  "postCreateCommand": "bun install",
   "customizations": {
     "vscode": {
       "extensions": [
