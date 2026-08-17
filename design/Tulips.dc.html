@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="./organic-styles.css">
+<style>
+@keyframes tpFade{from{opacity:0}to{opacity:1}}
+@keyframes tpSlideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+a{color:var(--color-accent)}
+a:hover{color:var(--color-accent-700)}
+.tp-nav-toggle{display:inline-flex}
+.tp-nav-desktop{display:none}
+.tp-filters-btn{display:inline-flex}
+.tp-filters-sidebar{display:none}
+.tp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
+.tp-hero{display:grid;grid-template-columns:1fr;gap:var(--space-6)}
+.tp-cats{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-3)}
+.tp-gallery{display:grid;grid-template-columns:1fr;gap:var(--space-3)}
+.tp-thumbs{display:flex;flex-direction:row;flex-wrap:wrap;gap:var(--space-2)}
+.tp-related{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
+.tp-footer-grid{display:grid;grid-template-columns:1fr;gap:var(--space-6)}
+.tp-detail{display:grid;grid-template-columns:1fr;gap:var(--space-6)}
+.tp-thumb{width:64px;height:64px;border-radius:var(--radius-sm);border:2px solid transparent;cursor:pointer;overflow:hidden;padding:0;flex:none;background:none}
+.tp-thumb.active{border-color:var(--color-accent)}
+.tp-heart.active{fill:var(--color-accent);stroke:var(--color-accent)}
+@media (min-width:720px){
+.tp-nav-toggle{display:none}
+.tp-nav-desktop{display:flex}
+.tp-filters-btn{display:none}
+.tp-filters-sidebar{display:block}
+.tp-grid{grid-template-columns:repeat(3,1fr)}
+.tp-cats{grid-template-columns:repeat(5,1fr)}
+.tp-gallery{grid-template-columns:76px 1fr}
+.tp-thumbs{flex-direction:column}
+.tp-related{grid-template-columns:repeat(4,1fr)}
+.tp-footer-grid{grid-template-columns:1.4fr 1fr 1fr 1fr}
+.tp-detail{grid-template-columns:1fr 1fr}
+.tp-hero{grid-template-columns:1.1fr 1fr}
+}
+@media (min-width:1080px){
+.tp-grid{grid-template-columns:repeat(4,1fr)}
+}
+</style>
+</helmet>
+<div style="{{ rootVars }} min-height:100dvh;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);transition:background .3s ease,color .3s ease;">
+
+<header style="position:sticky;top:0;z-index:30;background:var(--color-bg);border-bottom:1px solid var(--color-divider);transition:background .3s ease,border-color .3s ease;">
+  <div class="nav" style="max-width:1280px;margin:0 auto;width:100%;box-sizing:border-box;padding:var(--space-3) var(--space-6);">
+    <button class="btn btn-icon tp-nav-toggle" onClick="{{ toggleDrawer }}" aria-label="Open menu" style-hover="background:color-mix(in srgb, var(--color-text) 7%, transparent);">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg>
+    </button>
+    <div style="display:flex;align-items:center;gap:var(--space-6);flex:1;">
+      <a class="nav-brand" style="cursor:pointer;" onClick="{{ goHome }}">Tulips</a>
+      <nav class="tp-nav-desktop" style="gap:var(--space-4);">
+        <a style="cursor:pointer;" onClick="{{ goHome }}" aria-current="{{ navHomeCurrent }}">Home</a>
+        <a style="cursor:pointer;" onClick="{{ goProducts }}" aria-current="{{ navShopCurrent }}">Shop</a>
+      </nav>
+    </div>
+    <div style="display:flex;align-items:center;gap:var(--space-1);">
+      <button class="btn btn-icon" aria-label="Search" style-hover="background:color-mix(in srgb, var(--color-text) 7%, transparent);">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.2" y2="16.2"></line></svg>
+      </button>
+      <button class="btn btn-icon" aria-label="Account" style-hover="background:color-mix(in srgb, var(--color-text) 7%, transparent);">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path></svg>
+      </button>
+      <button class="btn btn-icon" aria-label="Cart" style-hover="background:color-mix(in srgb, var(--color-text) 7%, transparent);">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7L6 8Z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg>
+      </button>
+      <button class="btn btn-icon" aria-label="Toggle theme" onClick="{{ toggleTheme }}" style-hover="background:color-mix(in srgb, var(--color-text) 7%, transparent);">
+        <sc-if value="{{ isDark }}" hint-placeholder-val="{{ false }}">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"></circle><line x1="12" y1="2.5" x2="12" y2="5"></line><line x1="12" y1="19" x2="12" y2="21.5"></line><line x1="4.2" y1="4.2" x2="6" y2="6"></line><line x1="18" y1="18" x2="19.8" y2="19.8"></line><line x1="2.5" y1="12" x2="5" y2="12"></line><line x1="19" y1="12" x2="21.5" y2="12"></line><line x1="4.2" y1="19.8" x2="6" y2="18"></line><line x1="18" y1="6" x2="19.8" y2="4.2"></line></svg>
+        </sc-if>
+        <sc-if value="{{ isLight }}" hint-placeholder-val="{{ true }}">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"></path></svg>
+        </sc-if>
+      </button>
+    </div>
+  </div>
+</header>
+
+<sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:50;">
+    <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;background:color-mix(in srgb, var(--color-neutral-900) 55%, transparent);animation:tpFade .2s ease;"></div>
+    <div style="position:fixed;top:0;right:0;height:100%;width:min(320px,85vw);background:var(--color-bg);box-shadow:var(--shadow-lg);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-6);animation:tpSlideIn .25s ease;box-sizing:border-box;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span class="nav-brand">Tulips</span>
+        <button class="btn btn-icon" onClick="{{ closeDrawer }}" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="6" y1="18" x2="18" y2="6"></line></svg>
+        </button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);font-family:var(--font-heading);font-size:20px;">
+        <a style="cursor:pointer;" onClick="{{ goHome }}">Home</a>
+        <a style="cursor:pointer;" onClick="{{ goProducts }}">Shop all</a>
+      </div>
+      <div class="hr"></div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+        <span class="text-muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;">Categories</span>
+        <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="5">
+          <a style="cursor:pointer;font-size:15px;" onClick="{{ cat.onSelect }}">{{ cat.label }}</a>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ showHome }}" hint-placeholder-val="{{ true }}">
+  <main style="max-width:1280px;margin:0 auto;width:100%;box-sizing:border-box;">
+    <section style="padding:var(--space-8) var(--space-6);">
+      <div class="tp-hero" style="align-items:center;">
+        <div>
+          <span class="tag tag-accent-2">Fresh weekly</span>
+          <h1 style="font-size:clamp(34px,5vw,56px);max-width:14ch;margin:var(--space-3) 0 var(--space-3);">Flowers that feel like home.</h1>
+          <p style="max-width:44ch;font-size:16px;opacity:.85;margin-bottom:var(--space-4);">Hand-tied bouquets, potted greenery and gifts, arranged and delivered the same day.</p>
+          <button class="btn btn-primary" onClick="{{ goProducts }}" style="height:44px;padding-inline:var(--space-6);">Shop the collection</button>
+        </div>
+        <div class="washed" style="aspect-ratio:4/3;border-radius:var(--radius-lg);background:repeating-linear-gradient(135deg, var(--color-neutral-200) 0px, var(--color-neutral-200) 12px, var(--color-neutral-300) 12px, var(--color-neutral-300) 24px);display:flex;align-items:center;justify-content:center;">
+          <span style="font-family:monospace;font-size:12px;color:var(--color-neutral-700);background:var(--color-bg);padding:5px 10px;border-radius:6px;">hero photo — bouquet on a table</span>
+        </div>
+      </div>
+    </section>
+    <section style="padding:0 var(--space-6) var(--space-8);">
+      <h2 style="font-size:22px;margin-bottom:var(--space-4);">Shop by category</h2>
+      <div class="tp-cats">
+        <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="5">
+          <div onClick="{{ cat.onSelect }}" style="cursor:pointer;" style-hover="transform:scale(1.03);">
+            <div class="washed" style="aspect-ratio:1/1;border-radius:var(--radius-md);background:repeating-linear-gradient(135deg, var(--color-neutral-200) 0px, var(--color-neutral-200) 10px, var(--color-neutral-300) 10px, var(--color-neutral-300) 20px);transition:transform .2s ease;"></div>
+            <div style="font-family:var(--font-heading);font-size:14px;margin-top:var(--space-2);">{{ cat.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </main>
+</sc-if>
+
+<sc-if value="{{ showProducts }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:1280px;margin:0 auto;width:100%;box-sizing:border-box;padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4);">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:var(--space-2);">
+      <div>
+        <h1 style="font-size:28px;margin-bottom:4px;">Shop</h1>
+        <span class="text-muted" style="font-size:13px;">{{ resultsCount }} products</span>
+      </div>
+      <button class="btn btn-secondary tp-filters-btn" onClick="{{ toggleFilters }}">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"></line><circle cx="9" cy="6" r="1.6"></circle><line x1="4" y1="12" x2="20" y2="12"></line><circle cx="15" cy="12" r="1.6"></circle><line x1="4" y1="18" x2="20" y2="18"></line><circle cx="11" cy="18" r="1.6"></circle></svg>
+        Filters
+      </button>
+    </div>
+    <div style="display:flex;gap:var(--space-6);align-items:flex-start;">
+      <aside class="tp-filters-sidebar" style="width:220px;flex:none;display:flex;flex-direction:column;gap:var(--space-5);">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <h4 style="margin:0;">Filters</h4>
+          <sc-if value="{{ hasActiveFilters }}" hint-placeholder-val="{{ false }}">
+            <a style="cursor:pointer;font-size:12px;" onClick="{{ clearFilters }}">Clear</a>
+          </sc-if>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+          <span class="text-muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;">Category</span>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <sc-for list="{{ filterCategories }}" as="chip" hint-placeholder-count="5">
+              <a class="{{ chip.cls }}" style="cursor:pointer;text-decoration:none;user-select:none;" onClick="{{ chip.onClick }}">{{ chip.label }}</a>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+          <span class="text-muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;">Occasion</span>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <sc-for list="{{ filterOccasions }}" as="chip" hint-placeholder-count="6">
+              <a class="{{ chip.cls }}" style="cursor:pointer;text-decoration:none;user-select:none;" onClick="{{ chip.onClick }}">{{ chip.label }}</a>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+          <span class="text-muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;">Color</span>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <sc-for list="{{ filterColors }}" as="chip" hint-placeholder-count="7">
+              <a class="{{ chip.cls }}" style="cursor:pointer;text-decoration:none;user-select:none;" onClick="{{ chip.onClick }}">{{ chip.label }}</a>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+          <span class="text-muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;">Price</span>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <sc-for list="{{ pricePresets }}" as="chip" hint-placeholder-count="3">
+              <a class="{{ chip.cls }}" style="cursor:pointer;text-decoration:none;user-select:none;" onClick="{{ chip.onClick }}">{{ chip.label }}</a>
+            </sc-for>
+          </div>
+        </div>
+        <div>
+          <a class="{{ inStockChip.cls }}" style="cursor:pointer;text-decoration:none;user-select:none;" onClick="{{ inStockChip.onClick }}">{{ inStockChip.label }}</a>
+        </div>
+      </aside>
+
+      <div style="flex:1;min-width:0;">
+        <div class="tp-grid">
+          <sc-for list="{{ products }}" as="p" hint-placeholder-count="16">
+            <div class="tp-card" style="display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease;border-radius:var(--radius-md);" style-hover="transform:translateY(-4px);box-shadow:var(--shadow-md);" onClick="{{ p.onSelect }}">
+              <div class="washed" style="position:relative;aspect-ratio:4/5;border-radius:var(--radius-md);background:repeating-linear-gradient(135deg, var(--color-neutral-200) 0px, var(--color-neutral-200) 10px, var(--color-neutral-300) 10px, var(--color-neutral-300) 20px);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                <span style="font-family:monospace;font-size:10px;color:var(--color-neutral-700);background:var(--color-bg);padding:3px 7px;border-radius:6px;text-align:center;max-width:82%;">{{ p.name }} — photo</span>
+                <button aria-label="Wishlist" onClick="{{ p.onToggleHeart }}" style="position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:999px;border:none;background:var(--color-bg);display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="transform:scale(1.15);">
+                  <svg class="{{ p.heartCls }}" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-10-9.3C.4 8 1.8 4.5 5.2 3.6c2.1-.5 4.2.4 5.4 2.2l1.4 2 1.4-2c1.2-1.8 3.3-2.7 5.4-2.2 3.4.9 4.8 4.4 3.2 7.6-2.5 4.7-10 9.3-10 9.3Z"></path></svg>
+                </button>
+                <sc-if value="{{ p.outOfStock }}" hint-placeholder-val="{{ false }}">
+                  <span class="tag tag-neutral" style="position:absolute;bottom:8px;left:8px;">Out of stock</span>
+                </sc-if>
+              </div>
+              <div class="card-kicker">{{ p.category }}</div>
+              <div class="card-title">{{ p.name }}</div>
+              <div style="font-family:var(--font-heading);font-size:15px;">{{ p.priceLabel }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;justify-content:center;gap:6px;margin-top:var(--space-6);">
+          <span class="tp-page-pill" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:999px;font-size:13px;background:var(--color-accent);color:var(--color-bg);">1</span>
+          <span class="tp-page-pill" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:999px;font-size:13px;cursor:pointer;" style-hover="background:color-mix(in srgb, var(--color-text) 7%, transparent);">2</span>
+          <span class="tp-page-pill" style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:999px;font-size:13px;cursor:pointer;" style-hover="background:color-mix(in srgb, var(--color-text) 7%, transparent);">3</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</sc-if>
+
+<sc-if value="{{ filtersOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:50;">
+    <div onClick="{{ closeFilters }}" style="position:fixed;inset:0;background:color-mix(in srgb, var(--color-neutral-900) 55%, transparent);animation:tpFade .2s ease;"></div>
+    <div style="position:fixed;top:0;right:0;height:100%;width:min(320px,85vw);background:var(--color-bg);box-shadow:var(--shadow-lg);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-5);animation:tpSlideIn .25s ease;box-sizing:border-box;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <h4 style="margin:0;">Filters</h4>
+        <button class="btn btn-icon" onClick="{{ closeFilters }}" aria-label="Close filters">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="6" y1="18" x2="18" y2="6"></line></svg>
+        </button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+        <span class="text-muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;">Category</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <sc-for list="{{ filterCategories }}" as="chip" hint-placeholder-count="5">
+            <a class="{{ chip.cls }}" style="cursor:pointer;text-decoration:none;user-select:none;" onClick="{{ chip.onClick }}">{{ chip.label }}</a>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+        <span class="text-muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;">Occasion</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <sc-for list="{{ filterOccasions }}" as="chip" hint-placeholder-count="6">
+            <a class="{{ chip.cls }}" style="cursor:pointer;text-decoration:none;user-select:none;" onClick="{{ chip.onClick }}">{{ chip.label }}</a>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+        <span class="text-muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;">Color</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <sc-for list="{{ filterColors }}" as="chip" hint-placeholder-count="7">
+            <a class="{{ chip.cls }}" style="cursor:pointer;text-decoration:none;user-select:none;" onClick="{{ chip.onClick }}">{{ chip.label }}</a>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+        <span class="text-muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;">Price</span>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <sc-for list="{{ pricePresets }}" as="chip" hint-placeholder-count="3">
+            <a class="{{ chip.cls }}" style="cursor:pointer;text-decoration:none;user-select:none;" onClick="{{ chip.onClick }}">{{ chip.label }}</a>
+          </sc-for>
+        </div>
+      </div>
+      <a class="{{ inStockChip.cls }}" style="cursor:pointer;text-decoration:none;user-select:none;" onClick="{{ inStockChip.onClick }}">{{ inStockChip.label }}</a>
+      <button class="btn btn-primary btn-block" onClick="{{ closeFilters }}">Show results</button>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ showProduct }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:1280px;margin:0 auto;width:100%;box-sizing:border-box;padding:var(--space-6);">
+    <div style="font-size:13px;margin-bottom:var(--space-4);" class="text-muted">
+      <a style="cursor:pointer;" onClick="{{ goHome }}">Home</a> / <a style="cursor:pointer;" onClick="{{ goProducts }}">Shop</a> / {{ selected.category }} / <span style="color:var(--color-text);">{{ selected.name }}</span>
+    </div>
+    <div class="tp-detail">
+      <div class="tp-gallery">
+        <div class="tp-thumbs">
+          <sc-for list="{{ gallery }}" as="img" hint-placeholder-count="4">
+            <button class="{{ img.cls }}" onClick="{{ img.onSelect }}">
+              <div class="washed" style="width:100%;height:100%;background:repeating-linear-gradient(135deg, var(--color-neutral-200) 0px, var(--color-neutral-200) 8px, var(--color-neutral-300) 8px, var(--color-neutral-300) 16px);"></div>
+            </button>
+          </sc-for>
+        </div>
+        <div class="washed" style="aspect-ratio:4/5;border-radius:var(--radius-lg);background:repeating-linear-gradient(135deg, var(--color-neutral-200) 0px, var(--color-neutral-200) 14px, var(--color-neutral-300) 14px, var(--color-neutral-300) 28px);display:flex;align-items:center;justify-content:center;">
+          <span style="font-family:monospace;font-size:12px;color:var(--color-neutral-700);background:var(--color-bg);padding:5px 10px;border-radius:6px;text-align:center;">{{ mainCaption }}</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="tag tag-accent">{{ selected.category }}</span>
+          <span class="tag tag-accent-2">{{ selected.occasion }}</span>
+        </div>
+        <h1 style="margin:0;font-size:32px;">{{ selected.name }}</h1>
+        <div style="font-family:var(--font-heading);font-size:24px;color:var(--color-accent-700);">{{ selected.priceLabel }}</div>
+        <sc-if value="{{ selected.outOfStock }}" hint-placeholder-val="{{ false }}">
+          <span class="tag tag-neutral" style="align-self:flex-start;">Out of stock</span>
+        </sc-if>
+        <p style="font-size:15px;opacity:.85;max-width:52ch;">{{ selected.description }}</p>
+        <sc-if value="{{ selected.color }}" hint-placeholder-val="{{ false }}">
+          <span class="tag tag-outline" style="align-self:flex-start;">Color: {{ selected.color }}</span>
+        </sc-if>
+        <div style="display:flex;align-items:center;gap:var(--space-3);margin-top:var(--space-2);">
+          <div class="seg" style="width:fit-content;">
+            <button class="btn" onClick="{{ decQty }}" style="border-radius:0;width:36px;height:36px;padding:0;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-left:1px solid var(--color-divider);border-right:1px solid var(--color-divider);font-size:14px;">{{ qty }}</span>
+            <button class="btn" onClick="{{ incQty }}" style="border-radius:0;width:36px;height:36px;padding:0;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+          </div>
+          <button class="btn btn-primary" disabled="{{ addDisabled }}" style="height:44px;padding-inline:var(--space-6);flex:1;">{{ addLabel }}</button>
+          <button aria-label="Wishlist" onClick="{{ selected.onToggleHeart }}" class="btn btn-icon" style-hover="transform:scale(1.15);">
+            <svg class="{{ selected.heartCls }}" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-10-9.3C.4 8 1.8 4.5 5.2 3.6c2.1-.5 4.2.4 5.4 2.2l1.4 2 1.4-2c1.2-1.8 3.3-2.7 5.4-2.2 3.4.9 4.8 4.4 3.2 7.6-2.5 4.7-10 9.3-10 9.3Z"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <section style="margin-top:var(--space-8);">
+      <h2 style="font-size:22px;margin-bottom:var(--space-4);">You might also like</h2>
+      <div class="tp-related">
+        <sc-for list="{{ related }}" as="p" hint-placeholder-count="4">
+          <div class="tp-card" style="display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease;border-radius:var(--radius-md);" style-hover="transform:translateY(-4px);box-shadow:var(--shadow-md);" onClick="{{ p.onSelect }}">
+            <div class="washed" style="aspect-ratio:4/5;border-radius:var(--radius-md);background:repeating-linear-gradient(135deg, var(--color-neutral-200) 0px, var(--color-neutral-200) 10px, var(--color-neutral-300) 10px, var(--color-neutral-300) 20px);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+              <span style="font-family:monospace;font-size:10px;color:var(--color-neutral-700);background:var(--color-bg);padding:3px 7px;border-radius:6px;text-align:center;max-width:82%;">{{ p.name }} — photo</span>
+            </div>
+            <div class="card-kicker">{{ p.category }}</div>
+            <div class="card-title">{{ p.name }}</div>
+            <div style="font-family:var(--font-heading);font-size:15px;">{{ p.priceLabel }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </main>
+</sc-if>
+
+<footer style="border-top:1px solid var(--color-divider);margin-top:auto;transition:border-color .3s ease;">
+  <div class="tp-footer-grid" style="max-width:1280px;margin:0 auto;padding:var(--space-8) var(--space-6);box-sizing:border-box;">
+    <div>
+      <div class="nav-brand" style="margin-bottom:var(--space-2);">Tulips</div>
+      <p class="text-muted" style="font-size:13px;max-width:32ch;">A portfolio demo of a flower and bouquet shop — real checkout flow, fictional store.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+      <span class="text-muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;">Shop</span>
+      <a href="#">Flowers</a>
+      <a href="#">Bouquets</a>
+      <a href="#">Vases</a>
+      <a href="#">Greenery</a>
+      <a href="#">Gift add-ons</a>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+      <span class="text-muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;">Company</span>
+      <a href="#">About</a>
+      <a href="#">Careers</a>
+      <a href="#">Press</a>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+      <span class="text-muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;">Help</span>
+      <a href="#">Shipping</a>
+      <a href="#">Returns</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+  <div class="hr" style="margin:0;"></div>
+  <div style="max-width:1280px;margin:0 auto;padding:var(--space-4) var(--space-6);box-sizing:border-box;font-size:12px;" class="text-muted">
+    Tulips is a portfolio project. Not a real store.
+  </div>
+</footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const CATEGORIES = ['Flowers', 'Bouquets', 'Vases', 'Greenery', 'Gift Add-ons'];
+const OCCASIONS = ['Everyday', 'Birthday', 'Anniversary', 'Wedding', 'Sympathy', 'Congratulations'];
+const COLORS = ['Yellow', 'Pink', 'White', 'Green', 'Purple', 'Mixed', 'Natural'];
+
+const PRODUCTS = [
+  { id: 1, name: 'Sunrise Tulip Bundle', category: 'Flowers', price: 18, occasion: 'Everyday', color: 'Yellow', inStock: true, description: 'A hand-tied bundle of ten seasonal tulips in warm yellow and gold tones. Wrapped in kraft paper, ready to place straight into a vase.' },
+  { id: 2, name: 'Blush Peony Bouquet', category: 'Bouquets', price: 54, occasion: 'Anniversary', color: 'Pink', inStock: true, description: 'A dozen blush peonies gathered with eucalyptus and finished with a linen ribbon. Peonies ship in bud and open fully over three to five days.' },
+  { id: 3, name: 'Ceramic Ribbed Vase', category: 'Vases', price: 32, occasion: 'Everyday', color: 'Natural', inStock: true, description: 'A hand-thrown stoneware vase with a ribbed texture and matte cream glaze. Nine inches tall, holds water for fresh-cut stems.' },
+  { id: 4, name: 'Eucalyptus Bunch', category: 'Greenery', price: 12, occasion: 'Everyday', color: 'Green', inStock: true, description: 'A generous bunch of silver dollar eucalyptus, cut long for arranging or hanging to dry. Ships without water and lasts two to three weeks fresh.' },
+  { id: 5, name: 'Ivory Rose Dozen', category: 'Flowers', price: 46, occasion: 'Wedding', color: 'White', inStock: true, description: 'Twelve long-stemmed ivory roses, hand-tied with gypsophila. A classic choice for weddings and formal occasions.' },
+  { id: 6, name: 'Wildflower Meadow Mix', category: 'Bouquets', price: 38, occasion: 'Birthday', color: 'Mixed', inStock: false, description: 'An unstructured mix of seasonal wildflowers in warm pinks, oranges and yellows. No two bouquets are exactly alike.' },
+  { id: 7, name: 'Terracotta Bud Vase', category: 'Vases', price: 19, occasion: 'Everyday', color: 'Natural', inStock: true, description: 'A small terracotta bud vase sized for a single stem or a short cluster. Unglazed exterior, sealed interior.' },
+  { id: 8, name: 'Fern & Foliage Bundle', category: 'Greenery', price: 14, occasion: 'Everyday', color: 'Green', inStock: true, description: 'A mixed bundle of fern, salal and leather leaf for filling out arrangements or standing alone in a low vase.' },
+  { id: 9, name: 'Sympathy White Lily Arrangement', category: 'Bouquets', price: 65, occasion: 'Sympathy', color: 'White', inStock: true, description: 'White lilies and chrysanthemums arranged in a low bowl for sympathy and remembrance. Delivered arranged and ready to display.' },
+  { id: 10, name: 'Sunflower Stem Bunch', category: 'Flowers', price: 22, occasion: 'Birthday', color: 'Yellow', inStock: true, description: 'Eight full-headed sunflowers on long stems, hand-gathered with raffia twine.' },
+  { id: 11, name: 'Lavender Sprig Bundle', category: 'Greenery', price: 16, occasion: 'Everyday', color: 'Purple', inStock: true, description: 'Dried lavender sprigs bundled for display or drawer sachets. Holds its color and scent for months.' },
+  { id: 12, name: 'Congratulations Rose & Lily Box', category: 'Bouquets', price: 72, occasion: 'Congratulations', color: 'Mixed', inStock: true, description: 'Red roses and stargazer lilies arranged in a gift box with a built-in water source, no vase required. Includes a gift card.' },
+  { id: 13, name: 'Glass Bubble Vase', category: 'Vases', price: 28, occasion: 'Everyday', color: 'Natural', inStock: false, description: 'A clear glass bubble vase, six inches wide, for low arrangements or floating blooms.' },
+  { id: 14, name: 'Chocolate Truffle Box', category: 'Gift Add-ons', price: 15, occasion: 'Everyday', color: null, inStock: true, description: 'Eight assorted dark and milk chocolate truffles in a kraft gift box. A common add-on to any bouquet order.' },
+  { id: 15, name: 'Scented Soy Candle', category: 'Gift Add-ons', price: 24, occasion: 'Everyday', color: null, inStock: true, description: 'A hand-poured soy candle in a reusable glass jar with a light floral note. Forty-hour burn time.' },
+  { id: 16, name: 'Ranunculus Garden Bunch', category: 'Flowers', price: 34, occasion: 'Anniversary', color: 'Pink', inStock: true, description: 'A bunch of ruffled ranunculus in blush and coral tones, ten stems, hand-tied with twine.' }
+];
+
+class Component extends DCLogic {
+  state = {
+    page: 'home',
+    theme: 'light',
+    drawerOpen: false,
+    filtersOpen: false,
+    selectedId: 1,
+    activeImage: 0,
+    qty: 1,
+    wishlist: {},
+    filterCats: {},
+    filterOcc: {},
+    filterColors: {},
+    filterPrice: null,
+    inStockOnly: false
+  };
+
+  goTo(page) { this.setState({ page: page, drawerOpen: false, filtersOpen: false }); if (typeof window !== 'undefined') window.scrollTo(0, 0); }
+  selectProduct(id) { this.setState({ selectedId: id, page: 'product', activeImage: 0, qty: 1, drawerOpen: false }); if (typeof window !== 'undefined') window.scrollTo(0, 0); }
+  selectCategoryAndGo(label) { this.setState({ filterCats: { [label]: true }, page: 'products', drawerOpen: false }); }
+  toggleTheme() { this.setState(s => ({ theme: s.theme === 'light' ? 'dark' : 'light' })); }
+  toggleDrawer() { this.setState(s => ({ drawerOpen: !s.drawerOpen })); }
+  closeDrawer() { this.setState({ drawerOpen: false }); }
+  toggleFilters() { this.setState(s => ({ filtersOpen: !s.filtersOpen })); }
+  closeFilters() { this.setState({ filtersOpen: false }); }
+  toggleChip(group, label) { this.setState(s => { const g = Object.assign({}, s[group]); g[label] = !g[label]; return { [group]: g }; }); }
+  setPricePreset(v) { this.setState(s => ({ filterPrice: s.filterPrice === v ? null : v })); }
+  toggleInStockOnly() { this.setState(s => ({ inStockOnly: !s.inStockOnly })); }
+  clearFilters() { this.setState({ filterCats: {}, filterOcc: {}, filterColors: {}, filterPrice: null, inStockOnly: false }); }
+  setActiveImage(i) { this.setState({ activeImage: i }); }
+  incQty() { this.setState(s => ({ qty: Math.min(s.qty + 1, 20) })); }
+  decQty() { this.setState(s => ({ qty: Math.max(s.qty - 1, 1) })); }
+  toggleWishlist(id, e) { if (e && e.stopPropagation) e.stopPropagation(); this.setState(s => ({ wishlist: Object.assign({}, s.wishlist, { [id]: !s.wishlist[id] }) })); }
+
+  renderVals() {
+    const s = this.state;
+    const isDark = s.theme === 'dark';
+    const rootVars = isDark
+      ? '--color-bg:#2e2b25;--color-surface:#474238;--color-text:#f9f4ed;--color-divider:color-mix(in srgb, #f9f4ed 18%, transparent);'
+      : '';
+
+    const withCard = (p) => Object.assign({}, p, {
+      priceLabel: '$' + p.price,
+      outOfStock: !p.inStock,
+      heartCls: 'tp-heart' + (s.wishlist[p.id] ? ' active' : ''),
+      onSelect: () => this.selectProduct(p.id),
+      onToggleHeart: (e) => this.toggleWishlist(p.id, e)
+    });
+
+    const products = PRODUCTS.map(withCard);
+    const selectedRaw = PRODUCTS.find(p => p.id === s.selectedId) || PRODUCTS[0];
+    const selected = withCard(selectedRaw);
+
+    const gallery = [0, 1, 2, 3].map(i => ({
+      idx: i,
+      cls: 'tp-thumb' + (s.activeImage === i ? ' active' : ''),
+      onSelect: () => this.setActiveImage(i)
+    }));
+    const mainCaption = 'Image ' + (s.activeImage + 1) + ' of 4 — ' + selected.name;
+
+    const related = PRODUCTS.filter(p => p.id !== selected.id && p.category === selected.category)
+      .concat(PRODUCTS.filter(p => p.id !== selected.id && p.category !== selected.category))
+      .slice(0, 4).map(withCard);
+
+    const chip = (label, active, onClick) => ({ label: label, cls: 'tag ' + (active ? 'tag-accent' : 'tag-outline'), onClick: onClick });
+
+    const filterCategories = CATEGORIES.map(c => chip(c, !!s.filterCats[c], () => this.toggleChip('filterCats', c)));
+    const filterOccasions = OCCASIONS.map(o => chip(o, !!s.filterOcc[o], () => this.toggleChip('filterOcc', o)));
+    const filterColors = COLORS.map(c => chip(c, !!s.filterColors[c], () => this.toggleChip('filterColors', c)));
+    const pricePresets = ['Under $25', '$25 – $50', '$50+'].map(v => chip(v, s.filterPrice === v, () => this.setPricePreset(v)));
+    const inStockChip = chip('In stock only', s.inStockOnly, () => this.toggleInStockOnly());
+    const hasActiveFilters = Object.values(s.filterCats).some(Boolean) || Object.values(s.filterOcc).some(Boolean) || Object.values(s.filterColors).some(Boolean) || !!s.filterPrice || s.inStockOnly;
+
+    return {
+      showHome: s.page === 'home',
+      showProducts: s.page === 'products',
+      showProduct: s.page === 'product',
+      rootVars: rootVars,
+      isDark: isDark,
+      isLight: !isDark,
+      drawerOpen: s.drawerOpen,
+      filtersOpen: s.filtersOpen,
+      navHomeCurrent: s.page === 'home' ? 'page' : null,
+      navShopCurrent: (s.page === 'products' || s.page === 'product') ? 'page' : null,
+      goHome: () => this.goTo('home'),
+      goProducts: () => this.goTo('products'),
+      toggleDrawer: () => this.toggleDrawer(),
+      closeDrawer: () => this.closeDrawer(),
+      toggleTheme: () => this.toggleTheme(),
+      toggleFilters: () => this.toggleFilters(),
+      closeFilters: () => this.closeFilters(),
+      clearFilters: () => this.clearFilters(),
+      hasActiveFilters: hasActiveFilters,
+      products: products,
+      resultsCount: products.length,
+      categories: CATEGORIES.map(c => ({ label: c, onSelect: () => this.selectCategoryAndGo(c) })),
+      filterCategories: filterCategories,
+      filterOccasions: filterOccasions,
+      filterColors: filterColors,
+      pricePresets: pricePresets,
+      inStockChip: inStockChip,
+      selected: selected,
+      gallery: gallery,
+      mainCaption: mainCaption,
+      related: related,
+      qty: s.qty,
+      incQty: () => this.incQty(),
+      decQty: () => this.decQty(),
+      addDisabled: !selected.inStock,
+      addLabel: selected.inStock ? 'Add to cart' : 'Out of stock'
+    };
+  }
+}
+</script>
+</body>
+</html>
