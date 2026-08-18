@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "bun run scripts/seed-products.ts"
   },
   "dependencies": {
     "firebase-admin": "^14.2.0",
