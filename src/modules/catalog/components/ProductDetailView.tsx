@@ -57,7 +57,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
 
     if (notFound) {
       return (
-        <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-md px-lg py-2xl text-center">
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center gap-md px-lg text-center">
           <p className="text-[15px] text-foreground/70">
             We couldn&apos;t find that product — it may have been removed.
           </p>
