@@ -39,3 +39,25 @@ export interface Product {
   images: string[];
   primaryImageIndex: number;
 }
+
+export interface ProductFilters {
+  category?: ProductCategory[];
+  color?: string[];
+  occasion?: string[];
+  season?: ProductSeason;
+  size?: ProductSize;
+  minPrice?: number;
+  maxPrice?: number;
+  inStockOnly?: boolean;
+  excludeSlug?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface ProductsListResponse {
+  products: Product[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}

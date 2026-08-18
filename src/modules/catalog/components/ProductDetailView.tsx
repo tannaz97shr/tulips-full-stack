@@ -1,25 +1,81 @@
 "use client";
 
 import { useState } from "react";
+import { isAxiosError } from "axios";
 import Link from "next/link";
 import { Button } from "@/shared/components/atoms/Button";
 import { Tag } from "@/shared/components/atoms/Tag";
 import { HeartIcon } from "@/shared/components/icons";
+import { ErrorState } from "@/shared/components/molecules/ErrorState";
+import { LoadingState } from "@/shared/components/molecules/LoadingState";
 import { PlaceholderImage } from "@/shared/components/molecules/PlaceholderImage";
 import { ProductCard } from "@/shared/components/molecules/ProductCard";
 import { QuantityStepper } from "@/shared/components/molecules/QuantityStepper";
 import { formatPrice } from "@/shared/utils/formatPrice";
+import { useProduct } from "@/modules/catalog/hooks/useProduct";
+import { useProducts } from "@/modules/catalog/hooks/useProducts";
 import type { Product } from "@/modules/catalog/types";
 
 interface ProductDetailViewProps {
-  product: Product;
-  related: Product[];
+  slug: string;
 }
 
-export function ProductDetailView({ product, related }: ProductDetailViewProps) {
+function RelatedProducts({ related }: { related: Product[] }) {
+  if (related.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="mt-2xl">
+      <h2 className="mb-lg text-[22px]">You might also like</h2>
+      <div className="grid grid-cols-2 gap-lg md:grid-cols-4">
+        {related.map((item) => (
+          <ProductCard key={item.id} product={item} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export function ProductDetailView({ slug }: ProductDetailViewProps) {
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [liked, setLiked] = useState(false);
+
+  const { data: product, isLoading, isError, error, refetch } = useProduct(slug);
+  const { data: relatedData } = useProducts(
+    { category: product ? [product.category] : undefined, excludeSlug: slug, pageSize: 4 },
+    { enabled: Boolean(product) }
+  );
+
+  if (isLoading) {
+    return <LoadingState message="Loading product…" />;
+  }
+
+  if (isError) {
+    const notFound = isAxiosError(error) && error.response?.status === 404;
+
+    if (notFound) {
+      return (
+        <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-md px-lg py-2xl text-center">
+          <p className="text-[15px] text-foreground/70">
+            We couldn&apos;t find that product — it may have been removed.
+          </p>
+          <Button href="/products">Back to shop</Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="mx-auto w-full max-w-7xl px-lg py-lg">
+        <ErrorState message="We couldn't load this product." onRetry={() => refetch()} />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return null;
+  }
 
   return (
     <div className="mx-auto w-full max-w-7xl px-lg py-lg">
@@ -85,16 +141,7 @@ export function ProductDetailView({ product, related }: ProductDetailViewProps) 
         </div>
       </div>
 
-      {related.length > 0 ? (
-        <section className="mt-2xl">
-          <h2 className="mb-lg text-[22px]">You might also like</h2>
-          <div className="grid grid-cols-2 gap-lg md:grid-cols-4">
-            {related.map((item) => (
-              <ProductCard key={item.id} product={item} />
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <RelatedProducts related={relatedData?.products ?? []} />
     </div>
   );
 }

@@ -1,16 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/shared/components/atoms/Button";
 import { Tag } from "@/shared/components/atoms/Tag";
-import { CATEGORIES, COLORS, OCCASIONS, PRICE_PRESETS } from "@/modules/catalog/constants";
-
-function toggleInSet(set: Set<string>, value: string) {
-  const next = new Set(set);
-  if (next.has(value)) next.delete(value);
-  else next.add(value);
-  return next;
-}
+import { CATEGORIES, COLORS, OCCASIONS, PRICE_PRESETS, SEASONS, SIZES } from "@/modules/catalog/constants";
+import { useProductFilters } from "@/modules/catalog/hooks/useProductFilters";
 
 interface ChipGroupProps {
   label: string;
@@ -39,27 +32,26 @@ interface FiltersPanelProps {
   onDone?: () => void;
 }
 
-/**
- * Visual-only for Phase 1: chips toggle their own active state but aren't
- * wired to ProductGrid yet — that lands with real data fetching.
- */
 export function FiltersPanel({ onDone }: FiltersPanelProps) {
-  const [categories, setCategories] = useState<Set<string>>(new Set());
-  const [occasions, setOccasions] = useState<Set<string>>(new Set());
-  const [colors, setColors] = useState<Set<string>>(new Set());
-  const [price, setPrice] = useState<Set<string>>(new Set());
-  const [inStockOnly, setInStockOnly] = useState(false);
+  const {
+    state,
+    hasActiveFilters,
+    toggleCategory,
+    toggleOccasion,
+    toggleColor,
+    setSeason,
+    setSize,
+    setPricePreset,
+    toggleInStockOnly,
+    clearAll,
+  } = useProductFilters();
 
-  const hasActiveFilters =
-    categories.size > 0 || occasions.size > 0 || colors.size > 0 || price.size > 0 || inStockOnly;
-
-  function clearAll() {
-    setCategories(new Set());
-    setOccasions(new Set());
-    setColors(new Set());
-    setPrice(new Set());
-    setInStockOnly(false);
-  }
+  const categories = new Set(state.categories);
+  const occasions = new Set(state.occasions);
+  const colors = new Set(state.colors);
+  const seasons = new Set(state.season ? [state.season] : []);
+  const sizes = new Set(state.size ? [state.size] : []);
+  const prices = new Set(state.pricePreset ? [state.pricePreset] : []);
 
   return (
     <div className="flex flex-col gap-lg">
@@ -71,32 +63,14 @@ export function FiltersPanel({ onDone }: FiltersPanelProps) {
           </button>
         ) : null}
       </div>
-      <ChipGroup
-        label="Category"
-        options={CATEGORIES}
-        active={categories}
-        onToggle={(option) => setCategories((current) => toggleInSet(current, option))}
-      />
-      <ChipGroup
-        label="Occasion"
-        options={OCCASIONS}
-        active={occasions}
-        onToggle={(option) => setOccasions((current) => toggleInSet(current, option))}
-      />
-      <ChipGroup
-        label="Color"
-        options={COLORS}
-        active={colors}
-        onToggle={(option) => setColors((current) => toggleInSet(current, option))}
-      />
-      <ChipGroup
-        label="Price"
-        options={PRICE_PRESETS}
-        active={price}
-        onToggle={(option) => setPrice((current) => toggleInSet(current, option))}
-      />
-      <button type="button" onClick={() => setInStockOnly((current) => !current)} className="self-start">
-        <Tag variant={inStockOnly ? "accent" : "outline"}>In stock only</Tag>
+      <ChipGroup label="Category" options={CATEGORIES} active={categories} onToggle={toggleCategory} />
+      <ChipGroup label="Occasion" options={OCCASIONS} active={occasions} onToggle={toggleOccasion} />
+      <ChipGroup label="Color" options={COLORS} active={colors} onToggle={toggleColor} />
+      <ChipGroup label="Season" options={SEASONS} active={seasons} onToggle={setSeason} />
+      <ChipGroup label="Size" options={SIZES} active={sizes} onToggle={setSize} />
+      <ChipGroup label="Price" options={PRICE_PRESETS} active={prices} onToggle={setPricePreset} />
+      <button type="button" onClick={toggleInStockOnly} className="self-start">
+        <Tag variant={state.inStockOnly ? "accent" : "outline"}>In stock only</Tag>
       </button>
       {onDone ? (
         <Button variant="primary" block onClick={onDone}>

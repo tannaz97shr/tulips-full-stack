@@ -10,6 +10,8 @@
     "seed": "bun run scripts/seed-products.ts"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.101.4",
+    "axios": "^1.19.0",
     "firebase-admin": "^14.2.0",
     "next": "16.3.1",
     "react": "19.2.8",

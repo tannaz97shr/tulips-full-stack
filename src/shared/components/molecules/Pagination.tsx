@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import { cn } from "@/shared/utils/cn";
 
 interface PaginationProps {
   pageCount: number;
+  page: number;
+  onPageChange: (page: number) => void;
 }
 
-/** Visual-only for Phase 1 — wiring to real page state happens with data fetching. */
-export function Pagination({ pageCount }: PaginationProps) {
-  const [page, setPage] = useState(1);
+export function Pagination({ pageCount, page, onPageChange }: PaginationProps) {
+  if (pageCount <= 1) {
+    return null;
+  }
 
   return (
     <div className="mt-xl flex justify-center gap-1.5">
@@ -17,7 +19,7 @@ export function Pagination({ pageCount }: PaginationProps) {
         <button
           key={pageNumber}
           type="button"
-          onClick={() => setPage(pageNumber)}
+          onClick={() => onPageChange(pageNumber)}
           className={cn(
             "flex h-8 w-8 items-center justify-center rounded-full text-[13px]",
             pageNumber === page ? "bg-accent text-background" : "hover:bg-foreground/7"
