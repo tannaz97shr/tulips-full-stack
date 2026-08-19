@@ -1,5 +1,6 @@
 import { isAxiosError } from "axios";
 import { apiClient } from "@/shared/lib/api-client";
+import { API_ROUTES } from "@/shared/lib/api-routes";
 import type { Product, ProductFilters, ProductsListResponse } from "@/modules/catalog/types";
 
 /**
@@ -31,13 +32,13 @@ function buildParams(filters: ProductFilters): URLSearchParams {
 }
 
 export async function fetchProducts(filters: ProductFilters): Promise<ProductsListResponse> {
-  const { data } = await apiClient.get<ProductsListResponse>("/products", {
+  const { data } = await apiClient.get<ProductsListResponse>(API_ROUTES.products.list, {
     params: buildParams(filters),
   });
   return data;
 }
 
 export async function fetchProductBySlug(slug: string): Promise<Product> {
-  const { data } = await apiClient.get<{ product: Product }>(`/products/${encodeURIComponent(slug)}`);
+  const { data } = await apiClient.get<{ product: Product }>(API_ROUTES.products.detail(slug));
   return data.product;
 }

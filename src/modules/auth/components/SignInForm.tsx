@@ -7,13 +7,14 @@ import { signIn } from "next-auth/react";
 import { Button } from "@/shared/components/atoms/Button";
 import { Input } from "@/shared/components/atoms/Input";
 import { FormField } from "@/shared/components/molecules/FormField";
+import { ROUTES } from "@/shared/routes";
 import { signInSchema, type SignInInput } from "@/modules/auth/lib/schemas";
 
 interface SignInFormProps {
   callbackUrl?: string;
 }
 
-export function SignInForm({ callbackUrl = "/" }: SignInFormProps) {
+export function SignInForm({ callbackUrl = ROUTES.home }: SignInFormProps) {
   const [formError, setFormError] = useState<string | null>(null);
 
   const {

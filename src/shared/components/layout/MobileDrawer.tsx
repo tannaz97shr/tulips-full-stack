@@ -4,6 +4,7 @@ import Link from "next/link";
 import { CATEGORIES } from "@/modules/catalog/constants";
 import { CloseIcon } from "@/shared/components/icons";
 import { Drawer } from "@/shared/components/molecules/Drawer";
+import { ROUTES } from "@/shared/routes";
 
 interface MobileDrawerProps {
   open: boolean;
@@ -25,10 +26,10 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
         </button>
       </div>
       <nav className="flex flex-col gap-md font-heading text-xl">
-        <Link href="/" onClick={onClose}>
+        <Link href={ROUTES.home} onClick={onClose}>
           Home
         </Link>
-        <Link href="/products" onClick={onClose}>
+        <Link href={ROUTES.products.list} onClick={onClose}>
           Shop all
         </Link>
       </nav>
@@ -36,7 +37,7 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
       <div className="flex flex-col gap-sm">
         <span className="text-xs tracking-wide text-foreground/70 uppercase">Categories</span>
         {CATEGORIES.map((category) => (
-          <Link key={category} href="/products" onClick={onClose} className="text-lg">
+          <Link key={category} href={ROUTES.products.list} onClick={onClose} className="text-lg">
             {category}
           </Link>
         ))}

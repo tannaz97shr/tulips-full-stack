@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { GoogleSignInButton } from "@/modules/auth/components/GoogleSignInButton";
 import { SignInForm } from "@/modules/auth/components/SignInForm";
+import { ROUTES } from "@/shared/routes";
 
 export default async function SignInPage(props: PageProps<"/sign-in">) {
   const searchParams = await props.searchParams;
   const callbackUrlParam = searchParams.callbackUrl;
-  const callbackUrl = typeof callbackUrlParam === "string" ? callbackUrlParam : "/";
+  const callbackUrl = typeof callbackUrlParam === "string" ? callbackUrlParam : ROUTES.home;
 
   return (
     <div className="flex flex-col gap-lg">
@@ -22,7 +23,7 @@ export default async function SignInPage(props: PageProps<"/sign-in">) {
       <GoogleSignInButton callbackUrl={callbackUrl} />
       <p className="text-center text-base text-foreground/70">
         Don&apos;t have an account?{" "}
-        <Link href="/sign-up" className="text-accent">
+        <Link href={ROUTES.signUp} className="text-accent">
           Sign up
         </Link>
       </p>

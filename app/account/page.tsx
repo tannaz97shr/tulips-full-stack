@@ -1,13 +1,14 @@
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/auth";
 import { Button } from "@/shared/components/atoms/Button";
+import { ROUTES } from "@/shared/routes";
 
 // Throwaway placeholder — proves the proxy redirect + page-level auth()
 // check end to end. A real account UI is future work.
 export default async function AccountPage() {
   const session = await auth();
   if (!session?.user) {
-    redirect("/sign-in?callbackUrl=/account");
+    redirect(ROUTES.signInWithCallback(ROUTES.account));
   }
 
   return (
@@ -19,7 +20,7 @@ export default async function AccountPage() {
       <form
         action={async () => {
           "use server";
-          await signOut({ redirectTo: "/" });
+          await signOut({ redirectTo: ROUTES.home });
         }}
       >
         <Button type="submit" variant="secondary">

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Tag } from "@/shared/components/atoms/Tag";
 import { HeartIcon } from "@/shared/components/icons";
+import { ROUTES } from "@/shared/routes";
 import { formatPrice } from "@/shared/utils/formatPrice";
 import type { Product } from "@/modules/catalog/types";
 import { PlaceholderImage } from "./PlaceholderImage";
@@ -17,7 +18,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link
-      href={`/products/${product.slug}`}
+      href={ROUTES.products.detail(product.slug)}
       className="group flex flex-col gap-2 rounded-md transition-transform hover:-translate-y-1"
     >
       <div className="relative">

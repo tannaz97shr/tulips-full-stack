@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ROUTES } from "@/shared/routes";
 import { PlaceholderImage } from "./PlaceholderImage";
 
 interface CategoryTileProps {
@@ -7,7 +8,7 @@ interface CategoryTileProps {
 
 export function CategoryTile({ label }: CategoryTileProps) {
   return (
-    <Link href="/products" className="group">
+    <Link href={ROUTES.products.list} className="group">
       <PlaceholderImage
         aspectRatio="1/1"
         rounded="md"

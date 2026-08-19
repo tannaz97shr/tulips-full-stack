@@ -11,6 +11,7 @@ import { LoadingState } from "@/shared/components/molecules/LoadingState";
 import { PlaceholderImage } from "@/shared/components/molecules/PlaceholderImage";
 import { ProductCard } from "@/shared/components/molecules/ProductCard";
 import { QuantityStepper } from "@/shared/components/molecules/QuantityStepper";
+import { ROUTES } from "@/shared/routes";
 import { formatPrice } from "@/shared/utils/formatPrice";
 import { useProduct } from "@/modules/catalog/hooks/useProduct";
 import { useProducts } from "@/modules/catalog/hooks/useProducts";
@@ -61,7 +62,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
           <p className="text-lg text-foreground/70">
             We couldn&apos;t find that product — it may have been removed.
           </p>
-          <Button href="/products">Back to shop</Button>
+          <Button href={ROUTES.products.list}>Back to shop</Button>
         </div>
       );
     }
@@ -80,7 +81,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
   return (
     <div className="mx-auto w-full max-w-7xl px-lg py-lg">
       <div className="mb-lg text-base text-foreground/70">
-        <Link href="/">Home</Link> / <Link href="/products">Shop</Link> / {product.category} /{" "}
+        <Link href={ROUTES.home}>Home</Link> / <Link href={ROUTES.products.list}>Shop</Link> / {product.category} /{" "}
         <span className="text-foreground">{product.name}</span>
       </div>
 

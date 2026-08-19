@@ -1,11 +1,12 @@
 import type { NextAuthConfig } from "next-auth";
 import { NextResponse } from "next/server";
+import { ROUTES } from "@/shared/routes";
 
 // specs/authentication.md: login required at checkout, and for
 // cart/account/order-history pages. specs/user-roles.md: admin routes
 // require an authenticated session AND role === "admin", server-side.
-const PROTECTED_PREFIXES = ["/account", "/orders", "/cart", "/checkout", "/admin"];
-const ADMIN_PREFIXES = ["/admin"];
+const PROTECTED_PREFIXES = [ROUTES.account, ROUTES.orders, ROUTES.cart, ROUTES.checkout, ROUTES.admin];
+const ADMIN_PREFIXES = [ROUTES.admin];
 
 /**
  * Deliberately has no providers/no bcrypt/firebase-admin imports — this is
@@ -20,7 +21,7 @@ const ADMIN_PREFIXES = ["/admin"];
  */
 export const authConfig: NextAuthConfig = {
   session: { strategy: "jwt" },
-  pages: { signIn: "/sign-in" },
+  pages: { signIn: ROUTES.signIn },
   providers: [],
   callbacks: {
     authorized({ request, auth }) {
@@ -29,14 +30,14 @@ export const authConfig: NextAuthConfig = {
       if (!isProtected) return true;
 
       if (!auth?.user) {
-        const signInUrl = new URL("/sign-in", request.url);
+        const signInUrl = new URL(ROUTES.signIn, request.url);
         signInUrl.searchParams.set("callbackUrl", pathname);
         return NextResponse.redirect(signInUrl);
       }
 
       const isAdminRoute = ADMIN_PREFIXES.some((prefix) => pathname.startsWith(prefix));
       if (isAdminRoute && auth.user.role !== "admin") {
-        return NextResponse.redirect(new URL("/", request.url));
+        return NextResponse.redirect(new URL(ROUTES.home, request.url));
       }
 
       return true;

@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { ROUTES } from "@/shared/routes";
 
 // Throwaway placeholder — proves role === "admin" is enforced server-side
 // even though proxy.ts already redirects non-admins. A real admin UI is
@@ -7,10 +8,10 @@ import { redirect } from "next/navigation";
 export default async function AdminPage() {
   const session = await auth();
   if (!session?.user) {
-    redirect("/sign-in?callbackUrl=/admin");
+    redirect(ROUTES.signInWithCallback(ROUTES.admin));
   }
   if (session.user.role !== "admin") {
-    redirect("/");
+    redirect(ROUTES.home);
   }
 
   return (

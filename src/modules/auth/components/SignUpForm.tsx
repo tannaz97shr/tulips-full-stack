@@ -8,6 +8,7 @@ import { isAxiosError } from "axios";
 import { Button } from "@/shared/components/atoms/Button";
 import { Input } from "@/shared/components/atoms/Input";
 import { FormField } from "@/shared/components/molecules/FormField";
+import { ROUTES } from "@/shared/routes";
 import { useRegister } from "@/modules/auth/hooks/useRegister";
 import { signUpSchema, type SignUpInput } from "@/modules/auth/lib/schemas";
 
@@ -15,7 +16,7 @@ interface SignUpFormProps {
   callbackUrl?: string;
 }
 
-export function SignUpForm({ callbackUrl = "/" }: SignUpFormProps) {
+export function SignUpForm({ callbackUrl = ROUTES.home }: SignUpFormProps) {
   const registerMutation = useRegister();
   const [formError, setFormError] = useState<string | null>(null);
 

@@ -3,6 +3,7 @@ import { Tag } from "@/shared/components/atoms/Tag";
 import { CategoryTile } from "@/shared/components/molecules/CategoryTile";
 import { PlaceholderImage } from "@/shared/components/molecules/PlaceholderImage";
 import { CATEGORIES } from "@/modules/catalog/constants";
+import { ROUTES } from "@/shared/routes";
 
 export default function Home() {
   return (
@@ -17,7 +18,7 @@ export default function Home() {
             <p className="mb-lg max-w-[44ch] text-base text-foreground/85">
               Hand-tied bouquets, potted greenery and gifts, arranged and delivered the same day.
             </p>
-            <Button href="/products" variant="primary" className="h-11 px-xl">
+            <Button href={ROUTES.products.list} variant="primary" className="h-11 px-xl">
               Shop the collection
             </Button>
           </div>

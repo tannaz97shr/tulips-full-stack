@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/shared/components/atoms/Button";
 import { CartIcon, MenuIcon, SearchIcon, UserIcon } from "@/shared/components/icons";
+import { ROUTES } from "@/shared/routes";
 import { ThemeToggle } from "./ThemeToggle";
 
 interface HeaderProps {
@@ -14,9 +15,9 @@ interface HeaderProps {
 export function Header({ onMenuClick }: HeaderProps) {
   const pathname = usePathname();
   const { status } = useSession();
-  const isHome = pathname === "/";
-  const isShop = pathname.startsWith("/products");
-  const accountHref = status === "authenticated" ? "/account" : "/sign-in";
+  const isHome = pathname === ROUTES.home;
+  const isShop = pathname.startsWith(ROUTES.products.list);
+  const accountHref = status === "authenticated" ? ROUTES.account : ROUTES.signIn;
 
   return (
     <header className="sticky top-0 z-30 border-b border-divider bg-background">
@@ -25,15 +26,19 @@ export function Header({ onMenuClick }: HeaderProps) {
           <MenuIcon width={20} height={20} />
         </Button>
         <div className="flex flex-1 items-center gap-xl">
-          <Link href="/" className="font-heading text-lg">
+          <Link href={ROUTES.home} className="font-heading text-lg">
             Tulips
           </Link>
           <nav className="hidden gap-lg md:flex">
-            <Link href="/" aria-current={isHome ? "page" : undefined} className={isHome ? "text-accent" : undefined}>
+            <Link
+              href={ROUTES.home}
+              aria-current={isHome ? "page" : undefined}
+              className={isHome ? "text-accent" : undefined}
+            >
               Home
             </Link>
             <Link
-              href="/products"
+              href={ROUTES.products.list}
               aria-current={isShop ? "page" : undefined}
               className={isShop ? "text-accent" : undefined}
             >
