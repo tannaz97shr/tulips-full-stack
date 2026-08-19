@@ -3,6 +3,7 @@ import { Caprasimo, Figtree } from "next/font/google";
 import { SiteShell } from "@/shared/components/layout/SiteShell";
 import { QueryProvider } from "@/shared/components/providers/QueryProvider";
 import { SessionProvider } from "@/shared/components/providers/SessionProvider";
+import { CONTENT } from "@/shared/content";
 import "./globals.css";
 
 const caprasimo = Caprasimo({
@@ -18,8 +19,8 @@ const figtree = Figtree({
 });
 
 export const metadata: Metadata = {
-  title: "Tulips — flowers & bouquets",
-  description: "A portfolio demo of a flower and bouquet shop.",
+  title: CONTENT.rootLayout.title,
+  description: CONTENT.rootLayout.description,
 };
 
 const THEME_BOOTSTRAP_SCRIPT = `(function () {

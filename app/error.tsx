@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { ErrorState } from "@/shared/components/molecules/ErrorState";
+import { CONTENT } from "@/shared/content";
 import { logError } from "@/shared/lib/log-error";
 
 export default function Error({
@@ -15,5 +16,5 @@ export default function Error({
     logError(error, { boundary: "root" });
   }, [error]);
 
-  return <ErrorState message="Something went wrong." onRetry={retry} />;
+  return <ErrorState message={CONTENT.errorState.defaultMessage} onRetry={retry} />;
 }

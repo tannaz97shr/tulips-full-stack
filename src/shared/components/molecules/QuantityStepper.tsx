@@ -1,6 +1,7 @@
 "use client";
 
 import { MinusIcon, PlusIcon } from "@/shared/components/icons";
+import { CONTENT } from "@/shared/content";
 
 interface QuantityStepperProps {
   value: number;
@@ -14,7 +15,7 @@ export function QuantityStepper({ value, onChange, min = 1, max = 20 }: Quantity
     <div className="inline-flex overflow-hidden rounded-full border border-divider">
       <button
         type="button"
-        aria-label="Decrease quantity"
+        aria-label={CONTENT.quantityStepper.decrease}
         onClick={() => onChange(Math.max(min, value - 1))}
         className="flex h-9 w-9 items-center justify-center hover:bg-foreground/7"
       >
@@ -25,7 +26,7 @@ export function QuantityStepper({ value, onChange, min = 1, max = 20 }: Quantity
       </span>
       <button
         type="button"
-        aria-label="Increase quantity"
+        aria-label={CONTENT.quantityStepper.increase}
         onClick={() => onChange(Math.min(max, value + 1))}
         className="flex h-9 w-9 items-center justify-center hover:bg-foreground/7"
       >

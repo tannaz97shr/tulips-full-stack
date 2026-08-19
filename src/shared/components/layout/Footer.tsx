@@ -1,10 +1,7 @@
 import Link from "next/link";
+import { CONTENT } from "@/shared/content";
 
-const SHOP_LINKS = ["Flowers", "Bouquets", "Vases", "Greenery", "Gift add-ons"];
-const COMPANY_LINKS = ["About", "Careers", "Press"];
-const HELP_LINKS = ["Shipping", "Returns", "Contact"];
-
-function FooterColumn({ title, links }: { title: string; links: string[] }) {
+function FooterColumn({ title, links }: { title: string; links: readonly string[] }) {
   return (
     <div className="flex flex-col gap-2 text-base">
       <span className="text-xs tracking-wide text-foreground/70 uppercase">{title}</span>
@@ -22,18 +19,16 @@ export function Footer() {
     <footer className="mt-auto border-t border-divider">
       <div className="mx-auto grid w-full max-w-7xl gap-xl px-lg py-2xl md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
-          <div className="mb-sm font-heading text-lg">Tulips</div>
-          <p className="max-w-[32ch] text-base text-foreground/70">
-            A portfolio demo of a flower and bouquet shop — real checkout flow, fictional store.
-          </p>
+          <div className="mb-sm font-heading text-lg">{CONTENT.wordmark}</div>
+          <p className="max-w-[32ch] text-base text-foreground/70">{CONTENT.footer.tagline}</p>
         </div>
-        <FooterColumn title="Shop" links={SHOP_LINKS} />
-        <FooterColumn title="Company" links={COMPANY_LINKS} />
-        <FooterColumn title="Help" links={HELP_LINKS} />
+        <FooterColumn title={CONTENT.footer.shopColumnTitle} links={CONTENT.footer.shopLinks} />
+        <FooterColumn title={CONTENT.footer.companyColumnTitle} links={CONTENT.footer.companyLinks} />
+        <FooterColumn title={CONTENT.footer.helpColumnTitle} links={CONTENT.footer.helpLinks} />
       </div>
       <div className="h-px bg-divider" />
       <div className="mx-auto w-full max-w-7xl px-lg py-md text-xs text-foreground/70">
-        Tulips is a portfolio project. Not a real store.
+        {CONTENT.footer.disclaimer}
       </div>
     </footer>
   );

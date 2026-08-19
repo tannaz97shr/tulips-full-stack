@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Tag } from "@/shared/components/atoms/Tag";
 import { HeartIcon } from "@/shared/components/icons";
+import { CONTENT } from "@/shared/content";
 import { ROUTES } from "@/shared/routes";
 import { formatPrice } from "@/shared/utils/formatPrice";
 import type { Product } from "@/modules/catalog/types";
@@ -22,10 +23,10 @@ export function ProductCard({ product }: ProductCardProps) {
       className="group flex flex-col gap-2 rounded-md transition-transform hover:-translate-y-1"
     >
       <div className="relative">
-        <PlaceholderImage aspectRatio="4/5" caption={`${product.name} — photo`} />
+        <PlaceholderImage aspectRatio="4/5" caption={CONTENT.productCard.photoCaption(product.name)} />
         <button
           type="button"
-          aria-label="Toggle wishlist"
+          aria-label={CONTENT.productCard.toggleWishlist}
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
@@ -41,7 +42,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </button>
         {!product.inStock ? (
           <Tag variant="neutral" className="absolute bottom-2 left-2">
-            Out of stock
+            {CONTENT.productCard.outOfStock}
           </Tag>
         ) : null}
       </div>

@@ -2,6 +2,7 @@
 
 import { useTheme } from "@/shared/hooks/useTheme";
 import { MoonIcon, SunIcon } from "@/shared/components/icons";
+import { CONTENT } from "@/shared/content";
 
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -9,7 +10,7 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      aria-label="Toggle theme"
+      aria-label={CONTENT.themeToggle.toggleTheme}
       onClick={toggleTheme}
       className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-foreground/7"
     >

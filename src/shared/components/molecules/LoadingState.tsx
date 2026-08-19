@@ -1,10 +1,16 @@
+import { CONTENT } from "@/shared/content";
+
 interface LoadingStateProps {
   variant?: "inline" | "grid";
   message?: string;
   count?: number;
 }
 
-export function LoadingState({ variant = "inline", message = "Loading…", count = 8 }: LoadingStateProps) {
+export function LoadingState({
+  variant = "inline",
+  message = CONTENT.loadingState.defaultMessage,
+  count = 8,
+}: LoadingStateProps) {
   if (variant === "grid") {
     return (
       <div

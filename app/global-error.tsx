@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { CONTENT } from "@/shared/content";
 import { logError } from "@/shared/lib/log-error";
 
 export default function GlobalError({
@@ -36,9 +37,9 @@ export default function GlobalError({
             padding: "1.5rem",
           }}
         >
-          <p>Something went wrong.</p>
+          <p>{CONTENT.errorState.defaultMessage}</p>
           <button type="button" onClick={retry}>
-            Try again
+            {CONTENT.errorState.retry}
           </button>
         </div>
       </body>

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/shared/components/atoms/Button";
 import { CartIcon, MenuIcon, SearchIcon, UserIcon } from "@/shared/components/icons";
+import { CONTENT } from "@/shared/content";
 import { ROUTES } from "@/shared/routes";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -22,12 +23,17 @@ export function Header({ onMenuClick }: HeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-divider bg-background">
       <div className="mx-auto flex w-full max-w-7xl items-center gap-lg px-lg py-md">
-        <Button variant="icon" aria-label="Open menu" onClick={onMenuClick} className="md:hidden">
+        <Button
+          variant="icon"
+          aria-label={CONTENT.header.openMenu}
+          onClick={onMenuClick}
+          className="md:hidden"
+        >
           <MenuIcon width={20} height={20} />
         </Button>
         <div className="flex flex-1 items-center gap-xl">
           <Link href={ROUTES.home} className="font-heading text-lg">
-            Tulips
+            {CONTENT.wordmark}
           </Link>
           <nav className="hidden gap-lg md:flex">
             <Link
@@ -35,31 +41,31 @@ export function Header({ onMenuClick }: HeaderProps) {
               aria-current={isHome ? "page" : undefined}
               className={isHome ? "text-accent" : undefined}
             >
-              Home
+              {CONTENT.header.home}
             </Link>
             <Link
               href={ROUTES.products.list}
               aria-current={isShop ? "page" : undefined}
               className={isShop ? "text-accent" : undefined}
             >
-              Shop
+              {CONTENT.header.shop}
             </Link>
           </nav>
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="icon" aria-label="Search">
+          <Button variant="icon" aria-label={CONTENT.header.search}>
             <SearchIcon width={20} height={20} />
           </Button>
           <Button
             variant="icon"
-            aria-label="Account"
+            aria-label={CONTENT.header.account}
             href={accountHref}
             aria-disabled={status === "loading"}
             className={status === "loading" ? "pointer-events-none opacity-60" : undefined}
           >
             <UserIcon width={20} height={20} />
           </Button>
-          <Button variant="icon" aria-label="Cart">
+          <Button variant="icon" aria-label={CONTENT.header.cart}>
             <CartIcon width={20} height={20} />
           </Button>
           <ThemeToggle />
