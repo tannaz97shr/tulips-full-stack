@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/shared/components/atoms/Button";
+import { ROUTES } from "@/shared/routes";
 import { CONTENT } from "@/modules/admin/content";
 import { useProducts } from "@/modules/catalog/hooks/useProducts";
 import { ProductsTable } from "./ProductsTable";
@@ -13,11 +15,16 @@ export function ProductsView() {
 
   return (
     <div className="flex flex-col gap-lg">
-      <div>
-        <h1 className="mb-1 text-2xl">{CONTENT.productsView.heading}</h1>
-        <span className="text-base text-foreground/70">
-          {isLoading ? CONTENT.productsView.loading : CONTENT.productsView.productsCount(data?.totalCount ?? 0)}
-        </span>
+      <div className="flex items-start justify-between gap-sm">
+        <div>
+          <h1 className="mb-1 text-2xl">{CONTENT.productsView.heading}</h1>
+          <span className="text-base text-foreground/70">
+            {isLoading ? CONTENT.productsView.loading : CONTENT.productsView.productsCount(data?.totalCount ?? 0)}
+          </span>
+        </div>
+        <Button variant="primary" href={ROUTES.adminNewProduct}>
+          {CONTENT.productsTable.addProduct}
+        </Button>
       </div>
       <ProductsTable
         data={data}

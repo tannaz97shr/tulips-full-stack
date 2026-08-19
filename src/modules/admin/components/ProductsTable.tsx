@@ -1,10 +1,12 @@
 "use client";
 
+import { Button } from "@/shared/components/atoms/Button";
+import { Tag } from "@/shared/components/atoms/Tag";
 import { ErrorState } from "@/shared/components/molecules/ErrorState";
 import { LoadingState } from "@/shared/components/molecules/LoadingState";
 import { Pagination } from "@/shared/components/molecules/Pagination";
 import { PlaceholderImage } from "@/shared/components/molecules/PlaceholderImage";
-import { Tag } from "@/shared/components/atoms/Tag";
+import { ROUTES } from "@/shared/routes";
 import { formatPrice } from "@/shared/utils/formatPrice";
 import { CONTENT } from "@/modules/admin/content";
 import type { ProductsListResponse } from "@/modules/catalog/types";
@@ -48,6 +50,7 @@ export function ProductsTable({ data, isLoading, isError, onRetry, onPageChange 
               <th className="py-sm pr-sm font-normal">{columns.price}</th>
               <th className="py-sm pr-sm font-normal">{columns.stock}</th>
               <th className="py-sm pr-sm font-normal">{columns.status}</th>
+              <th className="py-sm pr-sm font-normal">{columns.actions}</th>
             </tr>
           </thead>
           <tbody>
@@ -73,6 +76,13 @@ export function ProductsTable({ data, isLoading, isError, onRetry, onPageChange 
                       <Tag variant="accent-2">{CONTENT.productsTable.featured}</Tag>
                     ) : null}
                   </div>
+                </td>
+                <td className="py-sm pr-sm">
+                  {!product.isComposite ? (
+                    <Button variant="ghost" href={ROUTES.adminEditProduct(product.slug)}>
+                      {CONTENT.productsTable.edit}
+                    </Button>
+                  ) : null}
                 </td>
               </tr>
             ))}

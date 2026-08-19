@@ -10,6 +10,8 @@ export const ROUTES = {
   account: "/account",
   admin: "/admin",
   adminProducts: "/admin/products",
+  adminNewProduct: "/admin/products/new",
+  adminEditProduct: (slug: string) => `/admin/products/${encodeURIComponent(slug)}/edit`,
   // no page yet — referenced only by auth.config.ts's protected-route list
   orders: "/orders",
   cart: "/cart",

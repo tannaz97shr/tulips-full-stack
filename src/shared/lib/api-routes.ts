@@ -6,4 +6,10 @@ export const API_ROUTES = {
     list: "/products",
     detail: (slug: string) => `/products/${encodeURIComponent(slug)}`,
   },
+  admin: {
+    products: {
+      create: "/admin/products",
+      update: (slug: string) => `/admin/products/${encodeURIComponent(slug)}`,
+    },
+  },
 } as const;
