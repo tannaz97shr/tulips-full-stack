@@ -9,6 +9,7 @@ import { Button } from "@/shared/components/atoms/Button";
 import { Input } from "@/shared/components/atoms/Input";
 import { FormField } from "@/shared/components/molecules/FormField";
 import { ROUTES } from "@/shared/routes";
+import { CONTENT } from "@/modules/auth/content";
 import { useRegister } from "@/modules/auth/hooks/useRegister";
 import { signUpSchema, type SignUpInput } from "@/modules/auth/lib/schemas";
 
@@ -33,10 +34,10 @@ export function SignUpForm({ callbackUrl = ROUTES.home }: SignUpFormProps) {
       await registerMutation.mutateAsync(values);
     } catch (error) {
       if (isAxiosError(error) && error.response?.status === 409) {
-        setError("email", { message: "An account with this email already exists." });
+        setError("email", { message: CONTENT.signUpForm.emailAlreadyExists });
         return;
       }
-      setFormError("Something went wrong. Please try again.");
+      setFormError(CONTENT.signUpForm.genericError);
       return;
     }
 
@@ -46,7 +47,7 @@ export function SignUpForm({ callbackUrl = ROUTES.home }: SignUpFormProps) {
       redirect: false,
     });
     if (result?.error) {
-      setFormError("Account created, but sign-in failed. Try signing in.");
+      setFormError(CONTENT.signUpForm.postRegisterSignInFailed);
       return;
     }
     window.location.assign(callbackUrl);
@@ -54,16 +55,16 @@ export function SignUpForm({ callbackUrl = ROUTES.home }: SignUpFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-md" noValidate>
-      <FormField label="Name" error={errors.name?.message}>
+      <FormField label={CONTENT.fields.name} error={errors.name?.message}>
         {(id) => <Input id={id} type="text" autoComplete="name" {...register("name")} />}
       </FormField>
-      <FormField label="Email" error={errors.email?.message}>
+      <FormField label={CONTENT.fields.email} error={errors.email?.message}>
         {(id) => <Input id={id} type="email" autoComplete="email" {...register("email")} />}
       </FormField>
-      <FormField label="Password" error={errors.password?.message}>
+      <FormField label={CONTENT.fields.password} error={errors.password?.message}>
         {(id) => <Input id={id} type="password" autoComplete="new-password" {...register("password")} />}
       </FormField>
-      <FormField label="Confirm password" error={errors.confirmPassword?.message}>
+      <FormField label={CONTENT.fields.confirmPassword} error={errors.confirmPassword?.message}>
         {(id) => <Input id={id} type="password" autoComplete="new-password" {...register("confirmPassword")} />}
       </FormField>
       {formError ? (
@@ -72,7 +73,7 @@ export function SignUpForm({ callbackUrl = ROUTES.home }: SignUpFormProps) {
         </p>
       ) : null}
       <Button type="submit" variant="primary" block disabled={isSubmitting || registerMutation.isPending}>
-        {isSubmitting || registerMutation.isPending ? "Creating account…" : "Create account"}
+        {isSubmitting || registerMutation.isPending ? CONTENT.signUpForm.submitting : CONTENT.signUpForm.submit}
       </Button>
     </form>
   );

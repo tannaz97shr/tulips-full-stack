@@ -8,6 +8,7 @@ import { Button } from "@/shared/components/atoms/Button";
 import { Input } from "@/shared/components/atoms/Input";
 import { FormField } from "@/shared/components/molecules/FormField";
 import { ROUTES } from "@/shared/routes";
+import { CONTENT } from "@/modules/auth/content";
 import { signInSchema, type SignInInput } from "@/modules/auth/lib/schemas";
 
 interface SignInFormProps {
@@ -27,7 +28,7 @@ export function SignInForm({ callbackUrl = ROUTES.home }: SignInFormProps) {
     setFormError(null);
     const result = await signIn("credentials", { ...values, redirect: false });
     if (result?.ok !== true) {
-      setFormError("Invalid email or password.");
+      setFormError(CONTENT.signInForm.invalidCredentials);
       return;
     }
     window.location.assign(callbackUrl);
@@ -35,10 +36,10 @@ export function SignInForm({ callbackUrl = ROUTES.home }: SignInFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-md" noValidate>
-      <FormField label="Email" error={errors.email?.message}>
+      <FormField label={CONTENT.fields.email} error={errors.email?.message}>
         {(id) => <Input id={id} type="email" autoComplete="email" {...register("email")} />}
       </FormField>
-      <FormField label="Password" error={errors.password?.message}>
+      <FormField label={CONTENT.fields.password} error={errors.password?.message}>
         {(id) => <Input id={id} type="password" autoComplete="current-password" {...register("password")} />}
       </FormField>
       {formError ? (
@@ -47,7 +48,7 @@ export function SignInForm({ callbackUrl = ROUTES.home }: SignInFormProps) {
         </p>
       ) : null}
       <Button type="submit" variant="primary" block disabled={isSubmitting}>
-        {isSubmitting ? "Signing in…" : "Sign in"}
+        {isSubmitting ? CONTENT.signInForm.submitting : CONTENT.signInForm.submit}
       </Button>
     </form>
   );

@@ -1,20 +1,21 @@
 import { z } from "zod";
+import { CONTENT } from "@/modules/auth/content";
 
 export const signUpSchema = z
   .object({
-    name: z.string().min(1, "Name is required"),
-    email: z.email("Enter a valid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    name: z.string().min(1, CONTENT.validation.nameRequired),
+    email: z.email(CONTENT.validation.invalidEmail),
+    password: z.string().min(8, CONTENT.validation.passwordMinLength),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: CONTENT.validation.passwordsDoNotMatch,
     path: ["confirmPassword"],
   });
 
 export const signInSchema = z.object({
-  email: z.email("Enter a valid email address"),
-  password: z.string().min(1, "Password is required"),
+  email: z.email(CONTENT.validation.invalidEmail),
+  password: z.string().min(1, CONTENT.validation.passwordRequired),
 });
 
 export type SignUpInput = z.infer<typeof signUpSchema>;
