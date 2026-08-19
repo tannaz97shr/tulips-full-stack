@@ -3,6 +3,7 @@
 import { Button } from "@/shared/components/atoms/Button";
 import { Tag } from "@/shared/components/atoms/Tag";
 import { CATEGORIES, COLORS, OCCASIONS, PRICE_PRESETS, SEASONS, SIZES } from "@/modules/catalog/constants";
+import { CONTENT } from "@/modules/catalog/content";
 import { useProductFilters } from "@/modules/catalog/hooks/useProductFilters";
 
 interface ChipGroupProps {
@@ -56,25 +57,40 @@ export function FiltersPanel({ onDone }: FiltersPanelProps) {
   return (
     <div className="flex flex-col gap-lg">
       <div className="flex items-center justify-between">
-        <h4 className="m-0">Filters</h4>
+        <h4 className="m-0">{CONTENT.filters.heading}</h4>
         {hasActiveFilters ? (
           <button type="button" onClick={clearAll} className="text-xs">
-            Clear
+            {CONTENT.filters.clear}
           </button>
         ) : null}
       </div>
-      <ChipGroup label="Category" options={CATEGORIES} active={categories} onToggle={toggleCategory} />
-      <ChipGroup label="Occasion" options={OCCASIONS} active={occasions} onToggle={toggleOccasion} />
-      <ChipGroup label="Color" options={COLORS} active={colors} onToggle={toggleColor} />
-      <ChipGroup label="Season" options={SEASONS} active={seasons} onToggle={setSeason} />
-      <ChipGroup label="Size" options={SIZES} active={sizes} onToggle={setSize} />
-      <ChipGroup label="Price" options={PRICE_PRESETS} active={prices} onToggle={setPricePreset} />
+      <ChipGroup
+        label={CONTENT.filters.categoryLabel}
+        options={CATEGORIES}
+        active={categories}
+        onToggle={toggleCategory}
+      />
+      <ChipGroup
+        label={CONTENT.filters.occasionLabel}
+        options={OCCASIONS}
+        active={occasions}
+        onToggle={toggleOccasion}
+      />
+      <ChipGroup label={CONTENT.filters.colorLabel} options={COLORS} active={colors} onToggle={toggleColor} />
+      <ChipGroup label={CONTENT.filters.seasonLabel} options={SEASONS} active={seasons} onToggle={setSeason} />
+      <ChipGroup label={CONTENT.filters.sizeLabel} options={SIZES} active={sizes} onToggle={setSize} />
+      <ChipGroup
+        label={CONTENT.filters.priceLabel}
+        options={PRICE_PRESETS}
+        active={prices}
+        onToggle={setPricePreset}
+      />
       <button type="button" onClick={toggleInStockOnly} className="self-start">
-        <Tag variant={state.inStockOnly ? "accent" : "outline"}>In stock only</Tag>
+        <Tag variant={state.inStockOnly ? "accent" : "outline"}>{CONTENT.filters.inStockOnly}</Tag>
       </button>
       {onDone ? (
         <Button variant="primary" block onClick={onDone}>
-          Show results
+          {CONTENT.filters.showResults}
         </Button>
       ) : null}
     </div>

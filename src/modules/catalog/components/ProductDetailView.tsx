@@ -11,8 +11,10 @@ import { LoadingState } from "@/shared/components/molecules/LoadingState";
 import { PlaceholderImage } from "@/shared/components/molecules/PlaceholderImage";
 import { ProductCard } from "@/shared/components/molecules/ProductCard";
 import { QuantityStepper } from "@/shared/components/molecules/QuantityStepper";
+import { CONTENT as SHARED_CONTENT } from "@/shared/content";
 import { ROUTES } from "@/shared/routes";
 import { formatPrice } from "@/shared/utils/formatPrice";
+import { CONTENT } from "@/modules/catalog/content";
 import { useProduct } from "@/modules/catalog/hooks/useProduct";
 import { useProducts } from "@/modules/catalog/hooks/useProducts";
 import type { Product } from "@/modules/catalog/types";
@@ -28,7 +30,7 @@ function RelatedProducts({ related }: { related: Product[] }) {
 
   return (
     <section className="mt-2xl">
-      <h2 className="mb-lg text-xl">You might also like</h2>
+      <h2 className="mb-lg text-xl">{CONTENT.productDetailView.relatedHeading}</h2>
       <div className="grid grid-cols-2 gap-lg md:grid-cols-4">
         {related.map((item) => (
           <ProductCard key={item.id} product={item} />
@@ -50,7 +52,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
   );
 
   if (isLoading) {
-    return <LoadingState message="Loading product…" />;
+    return <LoadingState message={CONTENT.productDetailView.loading} />;
   }
 
   if (isError) {
@@ -59,17 +61,15 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
     if (notFound) {
       return (
         <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center gap-md px-lg text-center">
-          <p className="text-lg text-foreground/70">
-            We couldn&apos;t find that product — it may have been removed.
-          </p>
-          <Button href={ROUTES.products.list}>Back to shop</Button>
+          <p className="text-lg text-foreground/70">{CONTENT.productDetailView.notFound}</p>
+          <Button href={ROUTES.products.list}>{CONTENT.productDetailView.backToShop}</Button>
         </div>
       );
     }
 
     return (
       <div className="mx-auto w-full max-w-7xl px-lg py-lg">
-        <ErrorState message="We couldn't load this product." onRetry={() => refetch()} />
+        <ErrorState message={CONTENT.productDetailView.loadError} onRetry={() => refetch()} />
       </div>
     );
   }
@@ -81,7 +81,8 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
   return (
     <div className="mx-auto w-full max-w-7xl px-lg py-lg">
       <div className="mb-lg text-base text-foreground/70">
-        <Link href={ROUTES.home}>Home</Link> / <Link href={ROUTES.products.list}>Shop</Link> / {product.category} /{" "}
+        <Link href={ROUTES.home}>{CONTENT.productDetailView.breadcrumbHome}</Link> /{" "}
+        <Link href={ROUTES.products.list}>{CONTENT.productDetailView.breadcrumbShop}</Link> / {product.category} /{" "}
         <span className="text-foreground">{product.name}</span>
       </div>
 
@@ -104,7 +105,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
           <PlaceholderImage
             aspectRatio="4/5"
             rounded="lg"
-            caption={`Image ${activeImage + 1} of 4 — ${product.name}`}
+            caption={CONTENT.productDetailView.imageCaption(activeImage + 1, product.name)}
           />
         </div>
 
@@ -117,21 +118,26 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
           <div className="font-heading text-2xl text-accent-700">{formatPrice(product.price)}</div>
           {!product.inStock ? (
             <Tag variant="neutral" className="self-start">
-              Out of stock
+              {SHARED_CONTENT.productCard.outOfStock}
             </Tag>
           ) : null}
           <p className="max-w-[52ch] text-lg text-foreground/85">{product.description}</p>
           {product.colors[0] ? (
             <Tag variant="outline" className="self-start">
-              Color: {product.colors[0]}
+              {CONTENT.productDetailView.colorPrefix}
+              {product.colors[0]}
             </Tag>
           ) : null}
           <div className="mt-sm flex items-center gap-md">
             <QuantityStepper value={quantity} onChange={setQuantity} />
             <Button variant="primary" disabled={!product.inStock} className="h-11 flex-1 px-xl">
-              {product.inStock ? "Add to cart" : "Out of stock"}
+              {product.inStock ? CONTENT.productDetailView.addToCart : SHARED_CONTENT.productCard.outOfStock}
             </Button>
-            <Button variant="icon" aria-label="Toggle wishlist" onClick={() => setLiked((current) => !current)}>
+            <Button
+              variant="icon"
+              aria-label={CONTENT.productDetailView.toggleWishlist}
+              onClick={() => setLiked((current) => !current)}
+            >
               <HeartIcon
                 width={18}
                 height={18}
