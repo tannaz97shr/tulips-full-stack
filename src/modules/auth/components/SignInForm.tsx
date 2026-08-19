@@ -27,7 +27,7 @@ export function SignInForm({ callbackUrl = ROUTES.home }: SignInFormProps) {
   async function onSubmit(values: SignInInput) {
     setFormError(null);
     const result = await signIn("credentials", { ...values, redirect: false });
-    if (result?.ok !== true) {
+    if (result?.error) {
       setFormError(CONTENT.signInForm.invalidCredentials);
       return;
     }
