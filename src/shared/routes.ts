@@ -9,6 +9,7 @@ export const ROUTES = {
   signUp: "/sign-up",
   account: "/account",
   admin: "/admin",
+  adminProducts: "/admin/products",
   // no page yet — referenced only by auth.config.ts's protected-route list
   orders: "/orders",
   cart: "/cart",
