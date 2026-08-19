@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Button } from "@/shared/components/atoms/Button";
 import { CartIcon, MenuIcon, SearchIcon, UserIcon } from "@/shared/components/icons";
 import { ThemeToggle } from "./ThemeToggle";
@@ -12,8 +13,10 @@ interface HeaderProps {
 
 export function Header({ onMenuClick }: HeaderProps) {
   const pathname = usePathname();
+  const { status } = useSession();
   const isHome = pathname === "/";
   const isShop = pathname.startsWith("/products");
+  const accountHref = status === "authenticated" ? "/account" : "/sign-in";
 
   return (
     <header className="sticky top-0 z-30 border-b border-divider bg-background">
@@ -42,7 +45,13 @@ export function Header({ onMenuClick }: HeaderProps) {
           <Button variant="icon" aria-label="Search">
             <SearchIcon width={20} height={20} />
           </Button>
-          <Button variant="icon" aria-label="Account">
+          <Button
+            variant="icon"
+            aria-label="Account"
+            href={accountHref}
+            aria-disabled={status === "loading"}
+            className={status === "loading" ? "pointer-events-none opacity-60" : undefined}
+          >
             <UserIcon width={20} height={20} />
           </Button>
           <Button variant="icon" aria-label="Cart">

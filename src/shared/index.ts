@@ -1,4 +1,5 @@
 export * from "./components/atoms/Button";
+export * from "./components/atoms/Input";
 export * from "./components/atoms/Tag";
 export * from "./components/icons";
 export * from "./components/layout/Footer";
@@ -9,6 +10,7 @@ export * from "./components/layout/ThemeToggle";
 export * from "./components/molecules/CategoryTile";
 export * from "./components/molecules/Drawer";
 export * from "./components/molecules/ErrorState";
+export * from "./components/molecules/FormField";
 export * from "./components/molecules/LoadingState";
 export * from "./components/molecules/Pagination";
 export * from "./components/molecules/PlaceholderImage";

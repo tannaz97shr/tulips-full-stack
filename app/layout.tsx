@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Caprasimo, Figtree } from "next/font/google";
 import { SiteShell } from "@/shared/components/layout/SiteShell";
 import { QueryProvider } from "@/shared/components/providers/QueryProvider";
+import { SessionProvider } from "@/shared/components/providers/SessionProvider";
 import "./globals.css";
 
 const caprasimo = Caprasimo({
@@ -42,9 +43,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
       </head>
       <body className="flex min-h-full flex-col bg-background text-foreground">
-        <QueryProvider>
-          <SiteShell>{children}</SiteShell>
-        </QueryProvider>
+        <SessionProvider>
+          <QueryProvider>
+            <SiteShell>{children}</SiteShell>
+          </QueryProvider>
+        </SessionProvider>
       </body>
     </html>
   );
