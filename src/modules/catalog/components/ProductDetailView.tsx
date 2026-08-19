@@ -27,7 +27,7 @@ function RelatedProducts({ related }: { related: Product[] }) {
 
   return (
     <section className="mt-2xl">
-      <h2 className="mb-lg text-[22px]">You might also like</h2>
+      <h2 className="mb-lg text-xl">You might also like</h2>
       <div className="grid grid-cols-2 gap-lg md:grid-cols-4">
         {related.map((item) => (
           <ProductCard key={item.id} product={item} />
@@ -58,7 +58,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
     if (notFound) {
       return (
         <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center gap-md px-lg text-center">
-          <p className="text-[15px] text-foreground/70">
+          <p className="text-lg text-foreground/70">
             We couldn&apos;t find that product — it may have been removed.
           </p>
           <Button href="/products">Back to shop</Button>
@@ -79,7 +79,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-lg py-lg">
-      <div className="mb-lg text-[13px] text-foreground/70">
+      <div className="mb-lg text-base text-foreground/70">
         <Link href="/">Home</Link> / <Link href="/products">Shop</Link> / {product.category} /{" "}
         <span className="text-foreground">{product.name}</span>
       </div>
@@ -112,14 +112,14 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
             <Tag variant="accent">{product.category}</Tag>
             {product.occasions[0] ? <Tag variant="accent-2">{product.occasions[0]}</Tag> : null}
           </div>
-          <h1 className="m-0 text-[32px]">{product.name}</h1>
+          <h1 className="m-0 text-2xl">{product.name}</h1>
           <div className="font-heading text-2xl text-accent-700">{formatPrice(product.price)}</div>
           {!product.inStock ? (
             <Tag variant="neutral" className="self-start">
               Out of stock
             </Tag>
           ) : null}
-          <p className="max-w-[52ch] text-[15px] text-foreground/85">{product.description}</p>
+          <p className="max-w-[52ch] text-lg text-foreground/85">{product.description}</p>
           {product.colors[0] ? (
             <Tag variant="outline" className="self-start">
               Color: {product.colors[0]}

@@ -41,7 +41,7 @@ export function SignInForm({ callbackUrl = "/" }: SignInFormProps) {
         {(id) => <Input id={id} type="password" autoComplete="current-password" {...register("password")} />}
       </FormField>
       {formError ? (
-        <p className="text-[13px] text-accent-700" role="alert">
+        <p className="text-base text-accent-700" role="alert">
           {formError}
         </p>
       ) : null}

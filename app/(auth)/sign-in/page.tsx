@@ -11,16 +11,16 @@ export default async function SignInPage(props: PageProps<"/sign-in">) {
     <div className="flex flex-col gap-lg">
       <div className="flex flex-col gap-1">
         <h1 className="font-heading text-2xl">Sign in</h1>
-        <p className="text-[14px] text-foreground/70">Welcome back to Tulips.</p>
+        <p className="text-md text-foreground/70">Welcome back to Tulips.</p>
       </div>
       <SignInForm callbackUrl={callbackUrl} />
-      <div className="flex items-center gap-sm text-[12px] text-foreground/50">
+      <div className="flex items-center gap-sm text-sm text-foreground/50">
         <span className="h-px flex-1 bg-divider" />
         or
         <span className="h-px flex-1 bg-divider" />
       </div>
       <GoogleSignInButton callbackUrl={callbackUrl} />
-      <p className="text-center text-[13px] text-foreground/70">
+      <p className="text-center text-base text-foreground/70">
         Don&apos;t have an account?{" "}
         <Link href="/sign-up" className="text-accent">
           Sign up

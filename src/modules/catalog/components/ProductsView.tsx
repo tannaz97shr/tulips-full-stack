@@ -21,8 +21,8 @@ export function ProductsView() {
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-lg px-lg py-lg">
       <div className="flex flex-wrap items-baseline justify-between gap-sm">
         <div>
-          <h1 className="mb-1 text-[28px]">Shop</h1>
-          <span className="text-[13px] text-foreground/70">
+          <h1 className="mb-1 text-2xl">Shop</h1>
+          <span className="text-base text-foreground/70">
             {isLoading ? "Loading…" : `${data?.totalCount ?? 0} products`}
           </span>
         </div>
@@ -47,7 +47,7 @@ export function ProductsView() {
             </>
           ) : (
             <div className="flex flex-col items-center gap-md py-2xl text-center">
-              <p className="text-[15px] text-foreground/70">No products match your filters.</p>
+              <p className="text-lg text-foreground/70">No products match your filters.</p>
               <Button variant="secondary" onClick={clearAll}>
                 Clear filters
               </Button>

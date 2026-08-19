@@ -15,7 +15,7 @@ interface ChipGroupProps {
 function ChipGroup({ label, options, active, onToggle }: ChipGroupProps) {
   return (
     <div className="flex flex-col gap-sm">
-      <span className="text-[11px] tracking-wide text-foreground/70 uppercase">{label}</span>
+      <span className="text-xs tracking-wide text-foreground/70 uppercase">{label}</span>
       <div className="flex flex-wrap gap-1.5">
         {options.map((option) => (
           <button key={option} type="button" onClick={() => onToggle(option)}>

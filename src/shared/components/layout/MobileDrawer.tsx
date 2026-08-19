@@ -34,9 +34,9 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
       </nav>
       <div className="h-px bg-divider" />
       <div className="flex flex-col gap-sm">
-        <span className="text-[11px] tracking-wide text-foreground/70 uppercase">Categories</span>
+        <span className="text-xs tracking-wide text-foreground/70 uppercase">Categories</span>
         {CATEGORIES.map((category) => (
-          <Link key={category} href="/products" onClick={onClose} className="text-[15px]">
+          <Link key={category} href="/products" onClick={onClose} className="text-lg">
             {category}
           </Link>
         ))}

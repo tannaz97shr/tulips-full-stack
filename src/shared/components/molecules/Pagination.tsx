@@ -21,7 +21,7 @@ export function Pagination({ pageCount, page, onPageChange }: PaginationProps) {
           type="button"
           onClick={() => onPageChange(pageNumber)}
           className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-full text-[13px]",
+            "flex h-8 w-8 items-center justify-center rounded-full text-base",
             pageNumber === page ? "bg-accent text-background" : "hover:bg-foreground/7"
           )}
         >

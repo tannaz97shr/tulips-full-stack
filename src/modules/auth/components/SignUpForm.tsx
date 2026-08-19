@@ -66,7 +66,7 @@ export function SignUpForm({ callbackUrl = "/" }: SignUpFormProps) {
         {(id) => <Input id={id} type="password" autoComplete="new-password" {...register("confirmPassword")} />}
       </FormField>
       {formError ? (
-        <p className="text-[13px] text-accent-700" role="alert">
+        <p className="text-base text-accent-700" role="alert">
           {formError}
         </p>
       ) : null}

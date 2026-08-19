@@ -25,7 +25,7 @@ export function LoadingState({ variant = "inline", message = "Loading…", count
 
   return (
     <div
-      className="flex flex-col items-center gap-sm py-2xl text-center text-[13px] text-foreground/70"
+      className="flex flex-col items-center gap-sm py-2xl text-center text-base text-foreground/70"
       role="status"
       aria-live="polite"
     >

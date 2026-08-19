@@ -12,12 +12,12 @@ export function FormField({ label, error, children }: FormFieldProps) {
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-[11px] tracking-wide text-foreground/70 uppercase">
+      <label htmlFor={id} className="text-xs tracking-wide text-foreground/70 uppercase">
         {label}
       </label>
       {children(id)}
       {error ? (
-        <span className="text-[12px] text-accent-700" role="alert">
+        <span className="text-sm text-accent-700" role="alert">
           {error}
         </span>
       ) : null}

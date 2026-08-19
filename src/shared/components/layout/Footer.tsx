@@ -6,8 +6,8 @@ const HELP_LINKS = ["Shipping", "Returns", "Contact"];
 
 function FooterColumn({ title, links }: { title: string; links: string[] }) {
   return (
-    <div className="flex flex-col gap-2 text-[13px]">
-      <span className="text-[11px] tracking-wide text-foreground/70 uppercase">{title}</span>
+    <div className="flex flex-col gap-2 text-base">
+      <span className="text-xs tracking-wide text-foreground/70 uppercase">{title}</span>
       {links.map((label) => (
         <Link key={label} href="#">
           {label}
@@ -23,7 +23,7 @@ export function Footer() {
       <div className="mx-auto grid w-full max-w-7xl gap-xl px-lg py-2xl md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
           <div className="mb-sm font-heading text-lg">Tulips</div>
-          <p className="max-w-[32ch] text-[13px] text-foreground/70">
+          <p className="max-w-[32ch] text-base text-foreground/70">
             A portfolio demo of a flower and bouquet shop — real checkout flow, fictional store.
           </p>
         </div>

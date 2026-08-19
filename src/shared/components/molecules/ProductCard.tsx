@@ -44,9 +44,9 @@ export function ProductCard({ product }: ProductCardProps) {
           </Tag>
         ) : null}
       </div>
-      <div className="text-[10px] tracking-wide text-accent uppercase">{product.category}</div>
-      <div className="font-heading text-[17px] leading-tight">{product.name}</div>
-      <div className="font-heading text-[15px]">{formatPrice(product.price)}</div>
+      <div className="text-2xs tracking-wide text-accent uppercase">{product.category}</div>
+      <div className="font-heading text-lg leading-tight">{product.name}</div>
+      <div className="font-heading text-lg">{formatPrice(product.price)}</div>
     </Link>
   );
 }

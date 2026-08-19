@@ -26,7 +26,7 @@ export function PlaceholderImage({
       style={{ aspectRatio }}
     >
       {caption ? (
-        <span className="max-w-[82%] rounded-md bg-background px-2 py-1 text-center font-mono text-[10px] text-neutral-700">
+        <span className="max-w-[82%] rounded-md bg-background px-2 py-1 text-center font-mono text-2xs text-neutral-700">
           {caption}
         </span>
       ) : null}
