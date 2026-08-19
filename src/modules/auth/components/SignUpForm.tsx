@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { isAxiosError } from "axios";
 import { Button } from "@/shared/components/atoms/Button";
@@ -17,7 +16,6 @@ interface SignUpFormProps {
 }
 
 export function SignUpForm({ callbackUrl = "/" }: SignUpFormProps) {
-  const router = useRouter();
   const registerMutation = useRegister();
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -50,8 +48,7 @@ export function SignUpForm({ callbackUrl = "/" }: SignUpFormProps) {
       setFormError("Account created, but sign-in failed. Try signing in.");
       return;
     }
-    router.push(callbackUrl);
-    router.refresh();
+    window.location.assign(callbackUrl);
   }
 
   return (

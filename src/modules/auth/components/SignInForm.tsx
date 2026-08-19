@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Button } from "@/shared/components/atoms/Button";
 import { Input } from "@/shared/components/atoms/Input";
@@ -15,7 +14,6 @@ interface SignInFormProps {
 }
 
 export function SignInForm({ callbackUrl = "/" }: SignInFormProps) {
-  const router = useRouter();
   const [formError, setFormError] = useState<string | null>(null);
 
   const {
@@ -27,13 +25,11 @@ export function SignInForm({ callbackUrl = "/" }: SignInFormProps) {
   async function onSubmit(values: SignInInput) {
     setFormError(null);
     const result = await signIn("credentials", { ...values, redirect: false });
-    console.log(result);
     if (result?.ok !== true) {
       setFormError("Invalid email or password.");
       return;
     }
-    router.push(callbackUrl);
-    router.refresh();
+    window.location.assign(callbackUrl);
   }
 
   return (
