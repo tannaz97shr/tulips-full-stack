@@ -29,6 +29,10 @@ export const CONTENT = {
     featured: "Featured",
     addProduct: "Add product",
     edit: "Edit",
+    delete: "Delete",
+    deleteConfirm: (name: string) => `Delete "${name}"? This can't be undone.`,
+    deleteError: "Failed to delete product. Please try again.",
+    stockSaveError: "Failed to save stock count.",
   },
   fields: {
     name: "Name",

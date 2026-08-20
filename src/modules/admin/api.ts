@@ -12,3 +12,7 @@ export async function updateProduct(slug: string, input: Omit<ProductWriteInput,
   const { data } = await apiClient.put<{ product: Product }>(API_ROUTES.admin.products.update(slug), input);
   return data.product;
 }
+
+export async function deleteProduct(slug: string): Promise<void> {
+  await apiClient.delete(API_ROUTES.admin.products.update(slug));
+}

@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/shared/components/atoms/Button";
+import { Input } from "@/shared/components/atoms/Input";
 import { Tag } from "@/shared/components/atoms/Tag";
 import { ErrorState } from "@/shared/components/molecules/ErrorState";
 import { LoadingState } from "@/shared/components/molecules/LoadingState";
@@ -9,7 +11,10 @@ import { PlaceholderImage } from "@/shared/components/molecules/PlaceholderImage
 import { ROUTES } from "@/shared/routes";
 import { formatPrice } from "@/shared/utils/formatPrice";
 import { CONTENT } from "@/modules/admin/content";
-import type { ProductsListResponse } from "@/modules/catalog/types";
+import { useDeleteProduct } from "@/modules/admin/hooks/useDeleteProduct";
+import { useUpdateProduct } from "@/modules/admin/hooks/useUpdateProduct";
+import { toProductWriteInput } from "@/modules/admin/lib/toProductWriteInput";
+import type { Product, ProductsListResponse } from "@/modules/catalog/types";
 
 interface ProductsTableProps {
   data: ProductsListResponse | undefined;
@@ -20,7 +25,58 @@ interface ProductsTableProps {
   onPageChange: (page: number) => void;
 }
 
+interface ProductStockCellProps {
+  stockCount: number;
+  isSaving: boolean;
+  onSave: (stockCount: number) => Promise<void>;
+}
+
+// Keyed by `${product.id}-${stockCount}` at the call site so a confirmed
+// server-side change (a successful save, or a refetch) remounts this with
+// a fresh initial value instead of needing an effect to resync it.
+function ProductStockCell({ stockCount, isSaving, onSave }: ProductStockCellProps) {
+  const [value, setValue] = useState(stockCount);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleBlur() {
+    if (value === stockCount || Number.isNaN(value) || value < 0) {
+      setValue(stockCount);
+      return;
+    }
+    setError(null);
+    try {
+      await onSave(value);
+    } catch {
+      setError(CONTENT.productsTable.stockSaveError);
+      setValue(stockCount);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      <Input
+        type="number"
+        step="1"
+        min="0"
+        value={value}
+        disabled={isSaving}
+        className="w-20"
+        onChange={(event) => setValue(Number(event.target.value))}
+        onBlur={handleBlur}
+      />
+      {error ? (
+        <span className="text-sm text-accent-700" role="alert">
+          {error}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 export function ProductsTable({ data, isLoading, isError, onRetry, onPageChange }: ProductsTableProps) {
+  const updateMutation = useUpdateProduct();
+  const deleteMutation = useDeleteProduct();
+
   if (isLoading) {
     return <LoadingState message={CONTENT.productsView.loading} />;
   }
@@ -36,6 +92,22 @@ export function ProductsTable({ data, isLoading, isError, onRetry, onPageChange 
   }
 
   const columns = CONTENT.productsTable.columns;
+
+  async function handleStockSave(product: Product, stockCount: number) {
+    await updateMutation.mutateAsync({
+      slug: product.slug,
+      input: { ...toProductWriteInput(product), stockCount },
+    });
+  }
+
+  function handleDelete(product: Product) {
+    if (!window.confirm(CONTENT.productsTable.deleteConfirm(product.name))) {
+      return;
+    }
+    deleteMutation.mutate(product.slug, {
+      onError: () => window.alert(CONTENT.productsTable.deleteError),
+    });
+  }
 
   return (
     <>
@@ -63,7 +135,18 @@ export function ProductsTable({ data, isLoading, isError, onRetry, onPageChange 
                 <td className="py-sm pr-sm text-foreground/70">{product.sku}</td>
                 <td className="py-sm pr-sm text-foreground/70">{product.category}</td>
                 <td className="py-sm pr-sm">{formatPrice(product.price)}</td>
-                <td className="py-sm pr-sm">{product.stockCount}</td>
+                <td className="py-sm pr-sm">
+                  {!product.isComposite ? (
+                    <ProductStockCell
+                      key={`${product.id}-${product.stockCount}`}
+                      stockCount={product.stockCount}
+                      isSaving={updateMutation.isPending && updateMutation.variables?.slug === product.slug}
+                      onSave={(stockCount) => handleStockSave(product, stockCount)}
+                    />
+                  ) : (
+                    product.stockCount
+                  )}
+                </td>
                 <td className="py-sm pr-sm">
                   <div className="flex flex-wrap gap-1">
                     <Tag variant={product.inStock ? "accent" : "neutral"}>
@@ -79,9 +162,19 @@ export function ProductsTable({ data, isLoading, isError, onRetry, onPageChange 
                 </td>
                 <td className="py-sm pr-sm">
                   {!product.isComposite ? (
-                    <Button variant="ghost" href={ROUTES.adminEditProduct(product.slug)}>
-                      {CONTENT.productsTable.edit}
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" href={ROUTES.adminEditProduct(product.slug)}>
+                        {CONTENT.productsTable.edit}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => handleDelete(product)}
+                        disabled={deleteMutation.isPending && deleteMutation.variables === product.slug}
+                      >
+                        {CONTENT.productsTable.delete}
+                      </Button>
+                    </div>
                   ) : null}
                 </td>
               </tr>

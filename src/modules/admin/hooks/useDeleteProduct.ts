@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createProduct } from "@/modules/admin/api";
+import { deleteProduct } from "@/modules/admin/api";
 
-export function useCreateProduct() {
+export function useDeleteProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createProduct,
+    mutationFn: (slug: string) => deleteProduct(slug),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },

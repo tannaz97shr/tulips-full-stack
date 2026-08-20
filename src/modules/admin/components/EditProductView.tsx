@@ -17,12 +17,12 @@ interface EditProductViewProps {
 export function EditProductView({ slug }: EditProductViewProps) {
   const router = useRouter();
   const { data: product, isLoading, isError, refetch } = useProduct(slug);
-  const updateMutation = useUpdateProduct(slug);
+  const updateMutation = useUpdateProduct();
 
   async function handleSubmit(payload: ProductWriteInput) {
     // slug is immutable; the PUT route validates against a schema that
     // omits it, so a stray `slug` here is silently dropped server-side.
-    await updateMutation.mutateAsync(payload);
+    await updateMutation.mutateAsync({ slug, input: payload });
     router.push(ROUTES.adminProducts);
   }
 

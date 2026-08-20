@@ -49,3 +49,28 @@ export async function PUT(request: Request, { params }: RouteContext<"/api/admin
     return Response.json({ error: "Failed to update product" }, { status: 500 });
   }
 }
+
+export async function DELETE(_request: Request, { params }: RouteContext<"/api/admin/products/[slug]">) {
+  const { error: authError } = await requireAdminSession();
+  if (authError) return authError;
+
+  try {
+    const { slug } = await params;
+    const db = getAdminFirestore();
+    const ref = db.collection("products").doc(slug);
+    const existing = await ref.get();
+
+    if (!existing.exists) {
+      return Response.json({ error: "Product not found" }, { status: 404 });
+    }
+    if (existing.data()?.isComposite === true) {
+      return Response.json({ error: "Bouquets can't be deleted through this endpoint yet" }, { status: 400 });
+    }
+
+    await ref.delete();
+    return new Response(null, { status: 204 });
+  } catch (error) {
+    console.error("Failed to delete product:", error);
+    return Response.json({ error: "Failed to delete product" }, { status: 500 });
+  }
+}
