@@ -18,6 +18,7 @@ export * from "./components/molecules/LoadingState";
 export * from "./components/molecules/Pagination";
 export * from "./components/molecules/PlaceholderImage";
 export * from "./components/molecules/ProductCard";
+export * from "./components/molecules/ProductImage";
 export * from "./components/molecules/QuantityStepper";
 export * from "./hooks/useTheme";
 export * from "./utils/cn";
