@@ -13,8 +13,10 @@ import { ROUTES } from "@/shared/routes";
 import { dollarsToCents } from "@/shared/utils/dollarsToCents";
 import { slugify } from "@/shared/utils/slugify";
 import { CATEGORIES, COLORS, OCCASIONS, SEASONS, SIZES } from "@/modules/catalog/constants";
+import type { Product } from "@/modules/catalog/types";
 import { CONTENT } from "@/modules/admin/content";
 import { productFormSchema, type ProductFormInput, type ProductWriteInput } from "@/modules/admin/lib/schemas";
+import { ProductImageGallery } from "./ProductImageGallery";
 
 /** Thrown by `onSubmit` to attach a server-side error to a specific field (e.g. a slug conflict). */
 export class ProductFormFieldError extends Error {
@@ -29,6 +31,8 @@ export class ProductFormFieldError extends Error {
 interface ProductFormProps {
   defaultValues?: Partial<ProductFormInput>;
   slugLocked?: boolean;
+  /** When set (edit mode only — a new product has no slug yet to attach images to), renders the image gallery panel for this product. */
+  product?: Product;
   onSubmit: (payload: ProductWriteInput) => Promise<void>;
 }
 
@@ -49,7 +53,7 @@ const EMPTY_DEFAULTS: ProductFormInput = {
   priceDollars: 0,
 };
 
-export function ProductForm({ defaultValues, slugLocked = false, onSubmit }: ProductFormProps) {
+export function ProductForm({ defaultValues, slugLocked = false, product, onSubmit }: ProductFormProps) {
   const [formError, setFormError] = useState<string | null>(null);
   const [slugTouched, setSlugTouched] = useState(slugLocked);
 
@@ -119,6 +123,7 @@ export function ProductForm({ defaultValues, slugLocked = false, onSubmit }: Pro
           </>
         )}
       </FormField>
+      {product ? <ProductImageGallery product={product} /> : null}
       <FormField label={CONTENT.fields.description} error={errors.description?.message}>
         {(id) => <Textarea id={id} {...register("description")} />}
       </FormField>

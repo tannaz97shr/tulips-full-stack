@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminFirestore } from "@/shared/lib/firebase-admin";
 import { toProduct } from "@/modules/catalog/lib/toProduct";
@@ -16,6 +17,11 @@ interface ValidatedUpload {
   buffer: Buffer;
   mimeType: NonNullable<ReturnType<typeof detectProductImageMimeType>>;
 }
+
+const reorderSchema = z.object({
+  images: z.array(z.string()),
+  primaryImageIndex: z.number().int().nonnegative(),
+});
 
 export async function POST(request: Request, { params }: RouteContext<"/api/admin/products/[slug]/images">) {
   const { error: authError } = await requireAdminSession();
@@ -134,6 +140,60 @@ export async function DELETE(request: Request, { params }: RouteContext<"/api/ad
     console.error("Failed to delete product image:", error);
     return Response.json({ error: "Failed to delete image" }, { status: 500 });
   }
+
+  const doc = await ref.get();
+  return Response.json({ product: toProduct(doc) });
+}
+
+/**
+ * Reorders the images array and/or moves `primaryImageIndex` — used for
+ * both the up/down reorder controls and "set as primary" (same array, new
+ * index). Never trusts the client's `images` array outright: it must be an
+ * exact permutation of what's currently stored, so a stale or tampered
+ * client can't smuggle in URLs that were never uploaded through this
+ * product's own upload endpoint.
+ */
+export async function PATCH(request: Request, { params }: RouteContext<"/api/admin/products/[slug]/images">) {
+  const { error: authError } = await requireAdminSession();
+  if (authError) return authError;
+
+  const { slug } = await params;
+  const db = getAdminFirestore();
+  const ref = db.collection("products").doc(slug);
+  const existing = await ref.get();
+
+  if (!existing.exists) {
+    return Response.json({ error: "Product not found" }, { status: 404 });
+  }
+
+  const body = await request.json().catch(() => null);
+  const parsed = reorderSchema.safeParse(body);
+  if (!parsed.success) {
+    return Response.json(
+      { error: "Invalid input", issues: parsed.error.flatten().fieldErrors },
+      { status: 400 }
+    );
+  }
+
+  const { images: nextImages, primaryImageIndex } = parsed.data;
+  const currentImages: string[] = existing.data()?.images ?? [];
+
+  const isSamePermutation =
+    nextImages.length === currentImages.length &&
+    new Set(nextImages).size === currentImages.length &&
+    currentImages.every((url) => nextImages.includes(url));
+  if (!isSamePermutation) {
+    return Response.json({ error: "Image list is out of date — reload and try again" }, { status: 409 });
+  }
+  if (nextImages.length > 0 && primaryImageIndex >= nextImages.length) {
+    return Response.json({ error: "primaryImageIndex is out of range" }, { status: 400 });
+  }
+
+  await ref.update({
+    images: nextImages,
+    primaryImageIndex,
+    updatedAt: FieldValue.serverTimestamp(),
+  });
 
   const doc = await ref.get();
   return Response.json({ product: toProduct(doc) });

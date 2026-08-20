@@ -46,6 +46,7 @@ export function EditProductView({ slug }: EditProductViewProps) {
       <h1 className="mb-1 text-2xl">{CONTENT.editProductView.heading}</h1>
       <ProductForm
         slugLocked
+        product={product}
         defaultValues={{
           slug: product.slug,
           name: product.name,
