@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Button } from "@/shared/components/atoms/Button";
 import { Tag } from "@/shared/components/atoms/Tag";
 import { ArrowDownIcon, ArrowUpIcon, CloseIcon, StarIcon } from "@/shared/components/icons";
+import { ConfirmDialog } from "@/shared/components/molecules/ConfirmDialog";
 import { CONTENT } from "@/modules/admin/content";
 import { useUploadProductImages } from "@/modules/admin/hooks/useUploadProductImages";
 import { useDeleteProductImage } from "@/modules/admin/hooks/useDeleteProductImage";
@@ -20,6 +21,7 @@ const ACCEPTED_TYPES = "image/jpeg,image/png,image/webp";
 
 export function ProductImageGallery({ product }: ProductImageGalleryProps) {
   const [error, setError] = useState<string | null>(null);
+  const [imageUrlPendingRemoval, setImageUrlPendingRemoval] = useState<string | null>(null);
 
   const uploadMutation = useUploadProductImages();
   const deleteMutation = useDeleteProductImage();
@@ -40,8 +42,18 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
     }
   }
 
-  async function handleRemove(url: string) {
-    if (!window.confirm(CONTENT.productImageGallery.removeConfirm)) return;
+  function handleRemoveRequest(url: string) {
+    setImageUrlPendingRemoval(url);
+  }
+
+  function handleRemoveCancel() {
+    setImageUrlPendingRemoval(null);
+  }
+
+  async function handleRemoveConfirm() {
+    if (!imageUrlPendingRemoval) return;
+    const url = imageUrlPendingRemoval;
+    setImageUrlPendingRemoval(null);
     setError(null);
     try {
       await deleteMutation.mutateAsync({ slug: product.slug, url });
@@ -122,7 +134,7 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
                   variant="icon"
                   aria-label={CONTENT.productImageGallery.remove}
                   disabled={isBusy}
-                  onClick={() => handleRemove(url)}
+                  onClick={() => handleRemoveRequest(url)}
                 >
                   <CloseIcon width={14} height={14} />
                 </Button>
@@ -151,6 +163,17 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
           {error}
         </p>
       ) : null}
+
+      <ConfirmDialog
+        open={imageUrlPendingRemoval !== null}
+        title={CONTENT.productImageGallery.removeConfirmTitle}
+        message={CONTENT.productImageGallery.removeConfirm}
+        confirmLabel={CONTENT.productImageGallery.remove}
+        cancelLabel={CONTENT.productImageGallery.cancel}
+        variant="danger"
+        onConfirm={handleRemoveConfirm}
+        onCancel={handleRemoveCancel}
+      />
     </div>
   );
 }

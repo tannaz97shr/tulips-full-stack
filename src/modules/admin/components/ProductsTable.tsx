@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/shared/components/atoms/Button";
 import { Input } from "@/shared/components/atoms/Input";
 import { Tag } from "@/shared/components/atoms/Tag";
+import { ConfirmDialog } from "@/shared/components/molecules/ConfirmDialog";
 import { ErrorState } from "@/shared/components/molecules/ErrorState";
 import { LoadingState } from "@/shared/components/molecules/LoadingState";
 import { Pagination } from "@/shared/components/molecules/Pagination";
@@ -76,6 +77,8 @@ function ProductStockCell({ stockCount, isSaving, onSave }: ProductStockCellProp
 export function ProductsTable({ data, isLoading, isError, onRetry, onPageChange }: ProductsTableProps) {
   const updateMutation = useUpdateProduct();
   const deleteMutation = useDeleteProduct();
+  const [productPendingDelete, setProductPendingDelete] = useState<Product | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   if (isLoading) {
     return <LoadingState message={CONTENT.productsView.loading} />;
@@ -100,17 +103,31 @@ export function ProductsTable({ data, isLoading, isError, onRetry, onPageChange 
     });
   }
 
-  function handleDelete(product: Product) {
-    if (!window.confirm(CONTENT.productsTable.deleteConfirm(product.name))) {
-      return;
-    }
-    deleteMutation.mutate(product.slug, {
-      onError: () => window.alert(CONTENT.productsTable.deleteError),
+  function handleDeleteRequest(product: Product) {
+    setProductPendingDelete(product);
+  }
+
+  function handleDeleteCancel() {
+    setProductPendingDelete(null);
+  }
+
+  function handleDeleteConfirm() {
+    if (!productPendingDelete) return;
+    const slug = productPendingDelete.slug;
+    setProductPendingDelete(null);
+    setDeleteError(null);
+    deleteMutation.mutate(slug, {
+      onError: () => setDeleteError(CONTENT.productsTable.deleteError),
     });
   }
 
   return (
     <>
+      {deleteError ? (
+        <p className="mb-sm text-base text-accent-700" role="alert">
+          {deleteError}
+        </p>
+      ) : null}
       <div className="overflow-x-auto">
         <table className="w-full min-w-168 border-collapse text-left text-base">
           <thead>
@@ -169,7 +186,7 @@ export function ProductsTable({ data, isLoading, isError, onRetry, onPageChange 
                       <Button
                         type="button"
                         variant="ghost"
-                        onClick={() => handleDelete(product)}
+                        onClick={() => handleDeleteRequest(product)}
                         disabled={deleteMutation.isPending && deleteMutation.variables === product.slug}
                       >
                         {CONTENT.productsTable.delete}
@@ -183,6 +200,16 @@ export function ProductsTable({ data, isLoading, isError, onRetry, onPageChange 
         </table>
       </div>
       <Pagination pageCount={data.totalPages} page={data.page} onPageChange={onPageChange} />
+      <ConfirmDialog
+        open={productPendingDelete !== null}
+        title={CONTENT.productsTable.deleteConfirmTitle}
+        message={productPendingDelete ? CONTENT.productsTable.deleteConfirm(productPendingDelete.name) : ""}
+        confirmLabel={CONTENT.productsTable.delete}
+        cancelLabel={CONTENT.productsTable.cancel}
+        variant="danger"
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </>
   );
 }

@@ -11,6 +11,7 @@ export * from "./components/layout/SiteShell";
 export * from "./components/layout/ThemeToggle";
 export * from "./components/molecules/CategoryTile";
 export * from "./components/molecules/ChipMultiSelect";
+export * from "./components/molecules/ConfirmDialog";
 export * from "./components/molecules/Drawer";
 export * from "./components/molecules/ErrorState";
 export * from "./components/molecules/FormField";
