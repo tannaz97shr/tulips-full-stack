@@ -13,6 +13,30 @@ import { useProducts } from "@/modules/catalog/hooks/useProducts";
 import { FiltersPanel } from "./FiltersPanel";
 import { ProductGrid } from "./ProductGrid";
 
+// Mirrors ProductsView's own isLoading layout so the Suspense fallback in app/products/page.tsx doesn't flash before hydration.
+export function ProductsViewSkeleton() {
+  return (
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-lg px-lg py-lg">
+      <div className="flex flex-wrap items-baseline justify-between gap-sm">
+        <div>
+          <h1 className="mb-1 text-2xl">{CONTENT.productsView.heading}</h1>
+          <span className="text-base text-foreground/70">{CONTENT.productsView.loading}</span>
+        </div>
+        <Button variant="secondary" className="md:hidden" disabled>
+          <FilterIcon width={16} height={16} />
+          {CONTENT.filters.heading}
+        </Button>
+      </div>
+      <div className="flex items-start gap-xl">
+        <aside className="hidden w-[220px] flex-none md:block" aria-hidden="true" />
+        <div className="min-w-0 flex-1">
+          <LoadingState variant="grid" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ProductsView() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const { filters, setPage, clearAll } = useProductFilters();

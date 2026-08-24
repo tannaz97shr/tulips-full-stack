@@ -1,5 +1,10 @@
-import { ProductsView } from "@/modules/catalog/components/ProductsView";
+import { Suspense } from "react";
+import { ProductsView, ProductsViewSkeleton } from "@/modules/catalog/components/ProductsView";
 
 export default function ProductsPage() {
-  return <ProductsView />;
+  return (
+    <Suspense fallback={<ProductsViewSkeleton />}>
+      <ProductsView />
+    </Suspense>
+  );
 }
