@@ -125,7 +125,7 @@ export function ProductForm({
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit, (formErrors) => {
-        logError(formErrors, "ProductForm.handleFormSubmit:onInvalid");
+        logError(formErrors, "ProductForm.handleFormSubmit:onInvalid", { level: "warn" });
         setFormError(CONTENT.productForm.validationError);
       })}
       className="flex flex-col gap-md"
