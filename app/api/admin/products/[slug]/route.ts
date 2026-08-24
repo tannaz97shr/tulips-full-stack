@@ -5,9 +5,10 @@ import { toProduct } from "@/modules/catalog/lib/toProduct";
 import { productWriteSchema } from "@/modules/admin/lib/schemas";
 import { requireAdminSession } from "@/modules/admin/lib/requireAdminSession";
 
-// slug is the Firestore doc ID (see toProduct.ts) and is immutable after
-// creation — never accepted in the edit payload.
-const productUpdateSchema = productWriteSchema.omit({ slug: true });
+// slug and isComposite are immutable after creation (slug is the Firestore
+// doc ID, see toProduct.ts; a product can't switch between standalone and
+// composite) — neither is accepted in the edit payload.
+const productUpdateSchema = productWriteSchema.omit({ slug: true, isComposite: true });
 
 export async function PUT(request: Request, { params }: RouteContext<"/api/admin/products/[slug]">) {
   const { error: authError } = await requireAdminSession();
@@ -22,9 +23,7 @@ export async function PUT(request: Request, { params }: RouteContext<"/api/admin
     if (!existing.exists) {
       return Response.json({ error: "Product not found" }, { status: 404 });
     }
-    if (existing.data()?.isComposite === true) {
-      return Response.json({ error: "Bouquets can't be edited through this endpoint yet" }, { status: 400 });
-    }
+    const isComposite = existing.data()?.isComposite === true;
 
     const body = await request.json();
     const parsed = productUpdateSchema.safeParse(body);
@@ -34,11 +33,15 @@ export async function PUT(request: Request, { params }: RouteContext<"/api/admin
         { status: 400 }
       );
     }
+    if (isComposite && (!parsed.data.components || parsed.data.components.length === 0)) {
+      return Response.json({ error: "Bouquets need at least one component" }, { status: 400 });
+    }
 
-    const { species, ...rest } = parsed.data;
+    const { species, components, ...rest } = parsed.data;
     await ref.update({
       ...rest,
       species: species ? species : FieldValue.delete(),
+      ...(isComposite ? { components: components ?? [] } : {}),
       inStock: rest.stockCount > 0,
       updatedAt: FieldValue.serverTimestamp(),
     });
@@ -63,9 +66,6 @@ export async function DELETE(_request: Request, { params }: RouteContext<"/api/a
 
     if (!existing.exists) {
       return Response.json({ error: "Product not found" }, { status: 404 });
-    }
-    if (existing.data()?.isComposite === true) {
-      return Response.json({ error: "Bouquets can't be deleted through this endpoint yet" }, { status: 400 });
     }
 
     await ref.delete();

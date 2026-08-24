@@ -36,9 +36,6 @@ export async function POST(request: Request, { params }: RouteContext<"/api/admi
   if (!existing.exists) {
     return Response.json({ error: "Product not found" }, { status: 404 });
   }
-  if (existing.data()?.isComposite === true) {
-    return Response.json({ error: "Bouquets don't support image uploads through this endpoint yet" }, { status: 400 });
-  }
 
   let formData: FormData;
   try {

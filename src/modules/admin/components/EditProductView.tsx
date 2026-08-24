@@ -40,20 +40,13 @@ export function EditProductView({ slug }: EditProductViewProps) {
   if (isError || !product) {
     return <ErrorState message={CONTENT.editProductView.loadError} onRetry={() => refetch()} />;
   }
-  if (product.isComposite) {
-    return (
-      <div className="flex flex-col gap-lg">
-        <h1 className="mb-1 text-2xl">{CONTENT.editProductView.heading}</h1>
-        <p className="text-base text-foreground/70">{CONTENT.editProductView.compositeUnsupported}</p>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-lg">
       <h1 className="mb-1 text-2xl">{CONTENT.editProductView.heading}</h1>
       <ProductForm
         slugLocked
+        compositeLocked
         product={product}
         defaultValues={{
           slug: product.slug,
@@ -61,6 +54,8 @@ export function EditProductView({ slug }: EditProductViewProps) {
           description: product.description,
           sku: product.sku,
           category: product.category,
+          isComposite: product.isComposite,
+          components: product.components ?? [],
           colors: normalizeTaxonomyValues(product.colors, COLORS),
           occasions: normalizeTaxonomyValues(product.occasions, OCCASIONS),
           species: product.species ?? "",

@@ -8,7 +8,7 @@ export async function createProduct(input: ProductWriteInput): Promise<Product> 
   return data.product;
 }
 
-export async function updateProduct(slug: string, input: Omit<ProductWriteInput, "slug">): Promise<Product> {
+export async function updateProduct(slug: string, input: Omit<ProductWriteInput, "slug" | "isComposite">): Promise<Product> {
   const { data } = await apiClient.put<{ product: Product }>(API_ROUTES.admin.products.update(slug), input);
   return data.product;
 }
