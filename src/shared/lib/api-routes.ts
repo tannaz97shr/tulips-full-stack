@@ -13,4 +13,10 @@ export const API_ROUTES = {
       images: (slug: string) => `/admin/products/${encodeURIComponent(slug)}/images`,
     },
   },
+  checkout: {
+    session: "/checkout/session",
+  },
+  orders: {
+    detail: (orderId: string) => `/orders/${encodeURIComponent(orderId)}`,
+  },
 } as const;

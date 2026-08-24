@@ -20,6 +20,18 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Local Stripe webhook testing
+
+Checkout uses a signature-verified Stripe webhook (`app/api/webhooks/stripe/route.ts`) as the sole source of truth for payment status — the browser redirect after Stripe Checkout is never treated as proof of payment. To exercise that locally:
+
+1. Install the [Stripe CLI](https://stripe.com/docs/stripe-cli) and run `stripe login` once.
+2. In a separate terminal, forward events to your local dev server:
+   ```bash
+   stripe listen --forward-to localhost:3000/api/webhooks/stripe
+   ```
+3. Copy the `whsec_...` value the CLI prints into `STRIPE_WEBHOOK_SECRET` in `.env.local`.
+4. Complete a checkout in the app using a [Stripe test card](https://stripe.com/docs/testing) — the CLI forwards the real, signed event from that test-mode session to your local webhook route.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
