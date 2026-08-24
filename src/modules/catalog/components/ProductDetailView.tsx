@@ -10,6 +10,7 @@ import { ErrorState } from "@/shared/components/molecules/ErrorState";
 import { LoadingState } from "@/shared/components/molecules/LoadingState";
 import { PlaceholderImage } from "@/shared/components/molecules/PlaceholderImage";
 import { ProductCard } from "@/shared/components/molecules/ProductCard";
+import { ProductImage } from "@/shared/components/molecules/ProductImage";
 import { QuantityStepper } from "@/shared/components/molecules/QuantityStepper";
 import { CONTENT as SHARED_CONTENT } from "@/shared/content";
 import { ROUTES } from "@/shared/routes";
@@ -102,7 +103,10 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
               </button>
             ))}
           </div>
-          <PlaceholderImage
+          <ProductImage
+            src={product.images[product.primaryImageIndex]}
+            alt={product.name}
+            sizes="(max-width: 768px) 100vw, 50vw"
             aspectRatio="4/5"
             rounded="lg"
             caption={CONTENT.productDetailView.imageCaption(activeImage + 1, product.name)}

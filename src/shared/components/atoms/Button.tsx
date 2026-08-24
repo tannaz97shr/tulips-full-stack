@@ -2,7 +2,7 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
 import Link from "next/link";
 import { cn } from "@/shared/utils/cn";
 
-type ButtonVariant = "primary" | "secondary" | "ghost" | "icon";
+type ButtonVariant = "primary" | "secondary" | "ghost" | "icon" | "danger";
 
 const baseClasses =
   "inline-flex cursor-pointer select-none items-center justify-center gap-1.5 rounded-full border border-transparent font-heading text-sm leading-tight transition-colors disabled:cursor-not-allowed disabled:opacity-45";
@@ -12,6 +12,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   secondary: "border-divider px-md py-sm hover:bg-foreground/7 active:bg-foreground/14",
   ghost: "px-xs py-sm text-accent hover:bg-accent/10 active:bg-accent/18",
   icon: "h-9 w-9 hover:bg-foreground/7",
+  danger: "bg-accent-700 px-md py-sm text-background hover:bg-accent-800 active:bg-accent-900",
 };
 
 interface CommonProps {

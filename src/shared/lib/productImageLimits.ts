@@ -1,0 +1,2 @@
+export const MAX_PRODUCT_IMAGE_BYTES = 5 * 1024 * 1024;
+export const MAX_PRODUCT_IMAGES_PER_UPLOAD = 10;

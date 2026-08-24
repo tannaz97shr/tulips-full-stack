@@ -8,7 +8,7 @@ import { CONTENT } from "@/shared/content";
 import { ROUTES } from "@/shared/routes";
 import { formatPrice } from "@/shared/utils/formatPrice";
 import type { Product } from "@/modules/catalog/types";
-import { PlaceholderImage } from "./PlaceholderImage";
+import { ProductImage } from "./ProductImage";
 
 interface ProductCardProps {
   product: Product;
@@ -23,7 +23,13 @@ export function ProductCard({ product }: ProductCardProps) {
       className="group flex flex-col gap-2 rounded-md transition-transform hover:-translate-y-1"
     >
       <div className="relative">
-        <PlaceholderImage aspectRatio="4/5" caption={CONTENT.productCard.photoCaption(product.name)} />
+        <ProductImage
+          src={product.images[product.primaryImageIndex]}
+          alt={product.name}
+          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          aspectRatio="4/5"
+          caption={CONTENT.productCard.photoCaption(product.name)}
+        />
         <button
           type="button"
           aria-label={CONTENT.productCard.toggleWishlist}
