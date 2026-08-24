@@ -1,5 +1,6 @@
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminFirestore } from "@/shared/lib/firebase-admin";
+import { logError } from "@/shared/lib/log-error";
 import { toProduct } from "@/modules/catalog/lib/toProduct";
 import { productWriteSchema } from "@/modules/admin/lib/schemas";
 import { requireAdminSession } from "@/modules/admin/lib/requireAdminSession";
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
     const doc = await ref.get();
     return Response.json({ product: toProduct(doc) }, { status: 201 });
   } catch (error) {
-    console.error("Failed to create product:", error);
+    logError(error, "POST /api/admin/products");
     return Response.json({ error: "Failed to create product" }, { status: 500 });
   }
 }

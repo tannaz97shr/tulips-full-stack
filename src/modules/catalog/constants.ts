@@ -14,10 +14,11 @@ export const OCCASIONS = [
   "Anniversary",
   "Wedding",
   "Sympathy",
+  "Get Well",
   "Congratulations",
 ];
 
-export const COLORS = ["Yellow", "Pink", "White", "Green", "Purple", "Mixed", "Natural"];
+export const COLORS = ["Yellow", "Pink", "Red", "White", "Cream", "Green", "Purple", "Mixed", "Assorted", "Natural"];
 
 export const SEASONS: ProductSeason[] = ["spring", "summer", "autumn", "winter", "all-year"];
 

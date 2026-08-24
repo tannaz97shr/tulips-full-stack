@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { isAxiosError } from "axios";
 import { Button } from "@/shared/components/atoms/Button";
 import { Tag } from "@/shared/components/atoms/Tag";
 import { ArrowDownIcon, ArrowUpIcon, CloseIcon, StarIcon } from "@/shared/components/icons";
 import { ConfirmDialog } from "@/shared/components/molecules/ConfirmDialog";
+import { logError } from "@/shared/lib/log-error";
+import { MAX_PRODUCT_IMAGE_BYTES } from "@/shared/lib/productImageLimits";
 import { CONTENT } from "@/modules/admin/content";
 import { useUploadProductImages } from "@/modules/admin/hooks/useUploadProductImages";
 import { useDeleteProductImage } from "@/modules/admin/hooks/useDeleteProductImage";
@@ -35,10 +38,19 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
     if (files.length === 0) return;
 
     setError(null);
+
+    const oversizedFile = files.find((file) => file.size > MAX_PRODUCT_IMAGE_BYTES);
+    if (oversizedFile) {
+      setError(CONTENT.productImageGallery.uploadTooLarge(oversizedFile.name));
+      return;
+    }
+
     try {
       await uploadMutation.mutateAsync({ slug: product.slug, files });
-    } catch {
-      setError(CONTENT.productImageGallery.uploadError);
+    } catch (error) {
+      logError(error, "ProductImageGallery.handleFileChange");
+      const serverMessage = isAxiosError<{ error?: string }>(error) ? error.response?.data?.error : undefined;
+      setError(serverMessage ?? CONTENT.productImageGallery.uploadError);
     }
   }
 
@@ -57,7 +69,8 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
     setError(null);
     try {
       await deleteMutation.mutateAsync({ slug: product.slug, url });
-    } catch {
+    } catch (error) {
+      logError(error, "ProductImageGallery.handleRemoveConfirm");
       setError(CONTENT.productImageGallery.removeError);
     }
   }
@@ -67,7 +80,8 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
     const { images, primaryIndex } = moveImage(product.images, product.primaryImageIndex, fromIndex, toIndex);
     try {
       await reorderMutation.mutateAsync({ slug: product.slug, images, primaryImageIndex: primaryIndex });
-    } catch {
+    } catch (error) {
+      logError(error, "ProductImageGallery.handleMove");
       setError(CONTENT.productImageGallery.reorderError);
     }
   }
@@ -76,7 +90,8 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
     setError(null);
     try {
       await reorderMutation.mutateAsync({ slug: product.slug, images: product.images, primaryImageIndex: index });
-    } catch {
+    } catch (error) {
+      logError(error, "ProductImageGallery.handleSetPrimary");
       setError(CONTENT.productImageGallery.reorderError);
     }
   }

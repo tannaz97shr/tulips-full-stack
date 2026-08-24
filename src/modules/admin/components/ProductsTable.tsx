@@ -8,7 +8,8 @@ import { ConfirmDialog } from "@/shared/components/molecules/ConfirmDialog";
 import { ErrorState } from "@/shared/components/molecules/ErrorState";
 import { LoadingState } from "@/shared/components/molecules/LoadingState";
 import { Pagination } from "@/shared/components/molecules/Pagination";
-import { PlaceholderImage } from "@/shared/components/molecules/PlaceholderImage";
+import { ProductImage } from "@/shared/components/molecules/ProductImage";
+import { logError } from "@/shared/lib/log-error";
 import { ROUTES } from "@/shared/routes";
 import { formatPrice } from "@/shared/utils/formatPrice";
 import { CONTENT } from "@/modules/admin/content";
@@ -47,7 +48,8 @@ function ProductStockCell({ stockCount, isSaving, onSave }: ProductStockCellProp
     setError(null);
     try {
       await onSave(value);
-    } catch {
+    } catch (error) {
+      logError(error, "ProductsTable.ProductStockCell");
       setError(CONTENT.productsTable.stockSaveError);
       setValue(stockCount);
     }
@@ -117,7 +119,10 @@ export function ProductsTable({ data, isLoading, isError, onRetry, onPageChange 
     setProductPendingDelete(null);
     setDeleteError(null);
     deleteMutation.mutate(slug, {
-      onError: () => setDeleteError(CONTENT.productsTable.deleteError),
+      onError: (error) => {
+        logError(error, "ProductsTable.handleDeleteConfirm");
+        setDeleteError(CONTENT.productsTable.deleteError);
+      },
     });
   }
 
@@ -146,7 +151,14 @@ export function ProductsTable({ data, isLoading, isError, onRetry, onPageChange 
             {data.products.map((product) => (
               <tr key={product.id} className="border-b border-foreground/8">
                 <td className="py-sm pr-sm">
-                  <PlaceholderImage aspectRatio="1/1" rounded="sm" className="w-10" />
+                  <ProductImage
+                    src={product.images[product.primaryImageIndex]}
+                    alt={product.name}
+                    sizes="40px"
+                    aspectRatio="1/1"
+                    rounded="sm"
+                    className="w-10"
+                  />
                 </td>
                 <td className="py-sm pr-sm">{product.name}</td>
                 <td className="py-sm pr-sm text-foreground/70">{product.sku}</td>

@@ -74,6 +74,7 @@ export const CONTENT = {
     submitting: "Saving…",
     cancel: "Cancel",
     genericError: "Something went wrong. Please try again.",
+    validationError: "Please fix the highlighted fields and try again.",
     slugTaken: "That slug is already in use — try a different one.",
   },
   productImageGallery: {
@@ -90,6 +91,7 @@ export const CONTENT = {
     removeConfirmTitle: "Remove image?",
     removeConfirm: "Remove this image? This can't be undone.",
     uploadError: "Failed to upload image(s). Please try again.",
+    uploadTooLarge: (name: string) => `${name} exceeds the 5MB limit.`,
     removeError: "Failed to remove image. Please try again.",
     reorderError: "Failed to update images. Please reload and try again.",
     cancel: "Cancel",

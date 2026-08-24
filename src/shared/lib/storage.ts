@@ -3,8 +3,7 @@ import { getAdminStorage } from "@/shared/lib/firebase-admin";
 
 export type ProductImageMimeType = "image/jpeg" | "image/png" | "image/webp";
 
-export const MAX_PRODUCT_IMAGE_BYTES = 5 * 1024 * 1024;
-export const MAX_PRODUCT_IMAGES_PER_UPLOAD = 10;
+export { MAX_PRODUCT_IMAGE_BYTES, MAX_PRODUCT_IMAGES_PER_UPLOAD } from "@/shared/lib/productImageLimits";
 
 const PRODUCT_IMAGE_EXTENSIONS: Record<ProductImageMimeType, string> = {
   "image/jpeg": "jpg",

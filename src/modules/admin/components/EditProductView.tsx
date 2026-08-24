@@ -1,12 +1,16 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ErrorState } from "@/shared/components/molecules/ErrorState";
 import { LoadingState } from "@/shared/components/molecules/LoadingState";
+import { logError } from "@/shared/lib/log-error";
 import { ROUTES } from "@/shared/routes";
 import { CONTENT } from "@/modules/admin/content";
 import { useUpdateProduct } from "@/modules/admin/hooks/useUpdateProduct";
 import { useProduct } from "@/modules/catalog/hooks/useProduct";
+import { COLORS, OCCASIONS } from "@/modules/catalog/constants";
+import { normalizeTaxonomyValues } from "@/modules/catalog/lib/normalizeTaxonomyValue";
 import type { ProductWriteInput } from "@/modules/admin/lib/schemas";
 import { ProductForm } from "./ProductForm";
 
@@ -16,8 +20,12 @@ interface EditProductViewProps {
 
 export function EditProductView({ slug }: EditProductViewProps) {
   const router = useRouter();
-  const { data: product, isLoading, isError, refetch } = useProduct(slug);
+  const { data: product, isLoading, isError, error, refetch } = useProduct(slug);
   const updateMutation = useUpdateProduct();
+
+  useEffect(() => {
+    if (isError) logError(error, "EditProductView");
+  }, [isError, error]);
 
   async function handleSubmit(payload: ProductWriteInput) {
     // slug is immutable; the PUT route validates against a schema that
@@ -53,8 +61,8 @@ export function EditProductView({ slug }: EditProductViewProps) {
           description: product.description,
           sku: product.sku,
           category: product.category,
-          colors: product.colors,
-          occasions: product.occasions,
+          colors: normalizeTaxonomyValues(product.colors, COLORS),
+          occasions: normalizeTaxonomyValues(product.occasions, OCCASIONS),
           species: product.species ?? "",
           size: product.size,
           season: product.season,

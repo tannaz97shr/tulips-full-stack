@@ -2,6 +2,7 @@ import { z } from "zod";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminFirestore } from "@/shared/lib/firebase-admin";
 import { toProduct } from "@/modules/catalog/lib/toProduct";
+import { logError } from "@/shared/lib/log-error";
 import { requireAdminSession } from "@/modules/admin/lib/requireAdminSession";
 import { nextPrimaryImageIndexAfterRemoval } from "@/modules/admin/lib/productImages";
 import {
@@ -81,7 +82,7 @@ export async function POST(request: Request, { params }: RouteContext<"/api/admi
       updatedAt: FieldValue.serverTimestamp(),
     });
   } catch (error) {
-    console.error("Failed to upload product image(s):", error);
+    logError(error, "POST /api/admin/products/[slug]/images");
     await Promise.allSettled(
       uploadedUrls.map((url) => {
         const path = productImagePathFromUrl(url);
@@ -137,7 +138,7 @@ export async function DELETE(request: Request, { params }: RouteContext<"/api/ad
       updatedAt: FieldValue.serverTimestamp(),
     });
   } catch (error) {
-    console.error("Failed to delete product image:", error);
+    logError(error, "DELETE /api/admin/products/[slug]/images");
     return Response.json({ error: "Failed to delete image" }, { status: 500 });
   }
 

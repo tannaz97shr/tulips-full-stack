@@ -1,5 +1,6 @@
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminFirestore } from "@/shared/lib/firebase-admin";
+import { logError } from "@/shared/lib/log-error";
 import { toProduct } from "@/modules/catalog/lib/toProduct";
 import { productWriteSchema } from "@/modules/admin/lib/schemas";
 import { requireAdminSession } from "@/modules/admin/lib/requireAdminSession";
@@ -45,7 +46,7 @@ export async function PUT(request: Request, { params }: RouteContext<"/api/admin
     const doc = await ref.get();
     return Response.json({ product: toProduct(doc) });
   } catch (error) {
-    console.error("Failed to update product:", error);
+    logError(error, "PUT /api/admin/products/[slug]");
     return Response.json({ error: "Failed to update product" }, { status: 500 });
   }
 }
@@ -70,7 +71,7 @@ export async function DELETE(_request: Request, { params }: RouteContext<"/api/a
     await ref.delete();
     return new Response(null, { status: 204 });
   } catch (error) {
-    console.error("Failed to delete product:", error);
+    logError(error, "DELETE /api/admin/products/[slug]");
     return Response.json({ error: "Failed to delete product" }, { status: 500 });
   }
 }
