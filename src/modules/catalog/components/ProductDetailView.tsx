@@ -15,6 +15,8 @@ import { QuantityStepper } from "@/shared/components/molecules/QuantityStepper";
 import { CONTENT as SHARED_CONTENT } from "@/shared/content";
 import { ROUTES } from "@/shared/routes";
 import { formatPrice } from "@/shared/utils/formatPrice";
+import { CONTENT as CART_CONTENT } from "@/modules/cart/content";
+import { useCart } from "@/modules/cart/hooks/useCart";
 import { CONTENT } from "@/modules/catalog/content";
 import { useProduct } from "@/modules/catalog/hooks/useProduct";
 import { useProducts } from "@/modules/catalog/hooks/useProducts";
@@ -45,6 +47,8 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [liked, setLiked] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
+  const { addItem } = useCart();
 
   const { data: product, isLoading, isError, error, refetch } = useProduct(slug);
   const { data: relatedData } = useProducts(
@@ -77,6 +81,22 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
 
   if (!product) {
     return null;
+  }
+
+  function handleAddToCart() {
+    if (!product) return;
+    addItem(
+      {
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.images[product.primaryImageIndex],
+        maxStock: product.stockCount,
+      },
+      quantity
+    );
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 2000);
   }
 
   return (
@@ -134,8 +154,17 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
           ) : null}
           <div className="mt-sm flex items-center gap-md">
             <QuantityStepper value={quantity} onChange={setQuantity} />
-            <Button variant="primary" disabled={!product.inStock} className="h-11 flex-1 px-xl">
-              {product.inStock ? CONTENT.productDetailView.addToCart : SHARED_CONTENT.productCard.outOfStock}
+            <Button
+              variant="primary"
+              disabled={!product.inStock}
+              onClick={handleAddToCart}
+              className="h-11 flex-1 px-xl"
+            >
+              {!product.inStock
+                ? SHARED_CONTENT.productCard.outOfStock
+                : justAdded
+                  ? CART_CONTENT.addToCart.added
+                  : CONTENT.productDetailView.addToCart}
             </Button>
             <Button
               variant="icon"

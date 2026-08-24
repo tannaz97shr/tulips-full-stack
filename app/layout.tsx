@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Caprasimo, Figtree } from "next/font/google";
 import { SiteShell } from "@/shared/components/layout/SiteShell";
+import { CartProvider } from "@/modules/cart/context/CartContext";
 import { QueryProvider } from "@/shared/components/providers/QueryProvider";
 import { SessionProvider } from "@/shared/components/providers/SessionProvider";
 import { CONTENT } from "@/shared/content";
@@ -45,9 +46,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <SessionProvider>
-          <QueryProvider>
-            <SiteShell>{children}</SiteShell>
-          </QueryProvider>
+          <CartProvider>
+            <QueryProvider>
+              <SiteShell>{children}</SiteShell>
+            </QueryProvider>
+          </CartProvider>
         </SessionProvider>
       </body>
     </html>

@@ -68,3 +68,45 @@ dev-server hot-reload artifact too.
 **Status:** Open, unreproduced. Left as-is per explicit decision rather
 than continuing to chase a fix with no repro path. Revisit if it recurs —
 capturing the exact click sequence/timing next time would help.
+
+## Stripe webhook signature verification failed under Bun (fixed)
+
+**Priority: Was Critical** — every real webhook delivery was silently
+rejected, meaning no order ever transitioned to `Paid` and no stock was
+ever decremented on a real payment, despite the checkout flow itself
+(cart, pricing, Stripe redirect, actual payment) working correctly end to
+end.
+
+**Root cause:** `app/api/webhooks/stripe/route.ts` called Stripe's
+synchronous `stripe.webhooks.constructEvent()`. This project runs via
+`bun run dev`/`bun run build` — Bun intercepts Node-shebang binaries like
+`next` and runs them under its own runtime, not real Node.js. The
+`stripe` npm package's `package.json` declares an explicit `"bun"` export
+condition that resolves to its worker/edge build, which only supports Web
+Crypto (no synchronous HMAC, since Node's `crypto` module isn't available
+there). Calling the sync `constructEvent()` against that build threw
+`SubtleCryptoProvider cannot be used in a synchronous context` — caught
+by the route's own `try/catch` and turned into a generic 400 "Invalid
+signature" response. Firestore was never touched, so every real webhook
+delivery failed at the very first step, before order status or stock
+were ever updated.
+
+**Impact:** Confirmed via two real Stripe test-mode payments — both
+orders correctly redirected through Stripe, both webhooks were delivered
+(confirmed via Stripe CLI logs), but both orders stayed `status: "Pending"`
+indefinitely with `processedStripeEventIds: []`, and the order-confirmation
+page polled forever without ever showing a resolved state.
+
+**Fix applied:** Swapped the synchronous call for Stripe's documented
+edge/worker-safe variant, `stripe.webhooks.constructEventAsync()`.
+
+**Verification:** Reproduced the exact failure by replaying a genuinely
+Stripe-signed `checkout.session.completed` event (using the real
+`STRIPE_WEBHOOK_SECRET` and real session data from the two stuck orders)
+directly against the local route — confirmed the same error occurred
+before the fix, and confirmed after the fix both orders correctly
+transitioned to `Paid` with accurate stock decrements, including the
+edge case of a product referenced both as a direct line item and as a
+bouquet component in the same order (decrements merged correctly, not
+double-applied). Idempotency was also verified by replaying the same
+event twice with no double-decrement.

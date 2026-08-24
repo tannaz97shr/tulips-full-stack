@@ -7,6 +7,7 @@ import { Button } from "@/shared/components/atoms/Button";
 import { CartIcon, MenuIcon, SearchIcon, UserIcon } from "@/shared/components/icons";
 import { CONTENT } from "@/shared/content";
 import { ROUTES } from "@/shared/routes";
+import { useCart } from "@/modules/cart/hooks/useCart";
 import { ThemeToggle } from "./ThemeToggle";
 
 interface HeaderProps {
@@ -16,6 +17,7 @@ interface HeaderProps {
 export function Header({ onMenuClick }: HeaderProps) {
   const pathname = usePathname();
   const { status } = useSession();
+  const { itemCount } = useCart();
   const isHome = pathname === ROUTES.home;
   const isShop = pathname.startsWith(ROUTES.products.list);
   const accountHref = status === "authenticated" ? ROUTES.account : ROUTES.signIn;
@@ -65,8 +67,13 @@ export function Header({ onMenuClick }: HeaderProps) {
           >
             <UserIcon width={20} height={20} />
           </Button>
-          <Button variant="icon" aria-label={CONTENT.header.cart}>
+          <Button variant="icon" aria-label={CONTENT.header.cart} href={ROUTES.cart} className="relative">
             <CartIcon width={20} height={20} />
+            {itemCount > 0 ? (
+              <span className="absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-2xs leading-none text-background">
+                {itemCount}
+              </span>
+            ) : null}
           </Button>
           <ThemeToggle />
         </div>
