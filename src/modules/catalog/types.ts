@@ -50,6 +50,8 @@ export interface ProductFilters {
   maxPrice?: number;
   inStockOnly?: boolean;
   excludeSlug?: string;
+  search?: string;
+  excludeComposite?: boolean;
   page?: number;
   pageSize?: number;
 }

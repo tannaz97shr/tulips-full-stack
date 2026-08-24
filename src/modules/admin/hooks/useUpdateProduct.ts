@@ -4,7 +4,7 @@ import type { ProductWriteInput } from "@/modules/admin/lib/schemas";
 
 interface UpdateProductArgs {
   slug: string;
-  input: Omit<ProductWriteInput, "slug">;
+  input: Omit<ProductWriteInput, "slug" | "isComposite">;
 }
 
 export function useUpdateProduct() {

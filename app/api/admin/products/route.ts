@@ -2,7 +2,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getAdminFirestore } from "@/shared/lib/firebase-admin";
 import { logError } from "@/shared/lib/log-error";
 import { toProduct } from "@/modules/catalog/lib/toProduct";
-import { productWriteSchema } from "@/modules/admin/lib/schemas";
+import { productCreateSchema } from "@/modules/admin/lib/schemas";
 import { requireAdminSession } from "@/modules/admin/lib/requireAdminSession";
 
 // gRPC status code Firestore's Admin SDK throws from DocumentReference.create()
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const parsed = productWriteSchema.safeParse(body);
+    const parsed = productCreateSchema.safeParse(body);
     if (!parsed.success) {
       return Response.json(
         { error: "Invalid input", issues: parsed.error.flatten().fieldErrors },
@@ -23,15 +23,16 @@ export async function POST(request: Request) {
       );
     }
 
-    const { slug, species, ...rest } = parsed.data;
+    const { slug, species, components, isComposite, ...rest } = parsed.data;
     const db = getAdminFirestore();
     const ref = db.collection("products").doc(slug);
 
     try {
       await ref.create({
         ...rest,
+        isComposite,
         ...(species ? { species } : {}),
-        isComposite: false,
+        ...(isComposite && components ? { components } : {}),
         inStock: rest.stockCount > 0,
         images: [],
         primaryImageIndex: 0,

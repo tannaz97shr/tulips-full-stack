@@ -28,6 +28,8 @@ export async function GET(request: Request) {
     const maxPrice = searchParams.get("maxPrice");
     const inStockOnly = searchParams.get("inStockOnly") === "true";
     const excludeSlug = searchParams.get("excludeSlug");
+    const search = searchParams.get("search");
+    const excludeComposite = searchParams.get("excludeComposite") === "true";
     const page = Math.max(1, Number(searchParams.get("page")) || 1);
     // Public, unauthenticated endpoint — clamp pageSize so a caller can't
     // request the entire collection in one request.
@@ -70,6 +72,13 @@ export async function GET(request: Request) {
     }
     if (excludeSlug) {
       products = products.filter((product) => product.slug !== excludeSlug);
+    }
+    if (search) {
+      const needle = search.toLowerCase();
+      products = products.filter((product) => product.name.toLowerCase().includes(needle));
+    }
+    if (excludeComposite) {
+      products = products.filter((product) => !product.isComposite);
     }
 
     const totalCount = products.length;

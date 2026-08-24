@@ -25,8 +25,9 @@ import { logError } from "@/shared/lib/log-error";
 import { dollarsToCents } from "@/shared/utils/dollarsToCents";
 import { slugify } from "@/shared/utils/slugify";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { ProductComponentsField } from "./ProductComponentsField";
 import { ProductImageGallery } from "./ProductImageGallery";
 
 /** Thrown by `onSubmit` to attach a server-side error to a specific field (e.g. a slug conflict). */
@@ -42,6 +43,8 @@ export class ProductFormFieldError extends Error {
 interface ProductFormProps {
   defaultValues?: Partial<ProductFormInput>;
   slugLocked?: boolean;
+  /** Locked in edit mode — a product can't switch between standalone and composite after creation. */
+  compositeLocked?: boolean;
   /** When set (edit mode only — a new product has no slug yet to attach images to), renders the image gallery panel for this product. */
   product?: Product;
   onSubmit: (payload: ProductWriteInput) => Promise<void>;
@@ -53,6 +56,8 @@ const EMPTY_DEFAULTS: ProductFormInput = {
   description: "",
   sku: "",
   category: CATEGORIES[0],
+  isComposite: false,
+  components: [],
   colors: [],
   occasions: [],
   species: "",
@@ -67,6 +72,7 @@ const EMPTY_DEFAULTS: ProductFormInput = {
 export function ProductForm({
   defaultValues,
   slugLocked = false,
+  compositeLocked = false,
   product,
   onSubmit,
 }: ProductFormProps) {
@@ -78,6 +84,7 @@ export function ProductForm({
     handleSubmit,
     setError,
     setValue,
+    watch,
     control,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -85,12 +92,22 @@ export function ProductForm({
     defaultValues: { ...EMPTY_DEFAULTS, ...defaultValues },
   });
 
+  const isComposite = watch("isComposite");
+
+  useEffect(() => {
+    if (isComposite) {
+      setValue("category", "Bouquets");
+      setValue("species", "");
+    }
+  }, [isComposite, setValue]);
+
   async function handleFormSubmit(values: ProductFormInput) {
     setFormError(null);
-    const { priceDollars, ...rest } = values;
+    const { priceDollars, components, ...rest } = values;
     const payload: ProductWriteInput = {
       ...rest,
       price: dollarsToCents(priceDollars),
+      components: rest.isComposite ? components : undefined,
     };
 
     try {
@@ -170,10 +187,27 @@ export function ProductForm({
             id={id}
             options={CATEGORIES}
             placeholder="Select a category"
+            disabled={isComposite}
+            className={isComposite ? "cursor-not-allowed opacity-60" : undefined}
             {...register("category")}
           />
         )}
       </FormField>
+      <div className="flex items-center gap-2">
+        <input
+          id="isComposite"
+          type="checkbox"
+          className="h-4 w-4"
+          disabled={compositeLocked}
+          {...register("isComposite")}
+        />
+        <label htmlFor="isComposite" className="text-base">
+          {CONTENT.fields.isComposite}
+        </label>
+      </div>
+      <span className="-mt-2 text-sm text-foreground/60">
+        {compositeLocked ? CONTENT.productForm.compositeLockedHelp : CONTENT.productForm.compositeHelp}
+      </span>
       <FormField label={CONTENT.fields.colors} error={errors.colors?.message}>
         {(id) => (
           <Controller
@@ -209,9 +243,18 @@ export function ProductForm({
           />
         )}
       </FormField>
-      <FormField label={CONTENT.fields.species} error={errors.species?.message}>
-        {(id) => <Input id={id} type="text" {...register("species")} />}
-      </FormField>
+      {isComposite ? (
+        <ProductComponentsField
+          control={control}
+          error={errors.components?.root?.message ?? errors.components?.message}
+          excludeSlug={product?.slug}
+          initialComponents={product?.components}
+        />
+      ) : (
+        <FormField label={CONTENT.fields.species} error={errors.species?.message}>
+          {(id) => <Input id={id} type="text" {...register("species")} />}
+        </FormField>
+      )}
       <FormField label={CONTENT.fields.size} error={errors.size?.message}>
         {(id) => (
           <Select

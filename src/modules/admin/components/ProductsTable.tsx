@@ -190,21 +190,19 @@ export function ProductsTable({ data, isLoading, isError, onRetry, onPageChange 
                   </div>
                 </td>
                 <td className="py-sm pr-sm">
-                  {!product.isComposite ? (
-                    <div className="flex gap-1">
-                      <Button variant="ghost" href={ROUTES.adminEditProduct(product.slug)}>
-                        {CONTENT.productsTable.edit}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => handleDeleteRequest(product)}
-                        disabled={deleteMutation.isPending && deleteMutation.variables === product.slug}
-                      >
-                        {CONTENT.productsTable.delete}
-                      </Button>
-                    </div>
-                  ) : null}
+                  <div className="flex gap-1">
+                    <Button variant="ghost" href={ROUTES.adminEditProduct(product.slug)}>
+                      {CONTENT.productsTable.edit}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => handleDeleteRequest(product)}
+                      disabled={deleteMutation.isPending && deleteMutation.variables === product.slug}
+                    >
+                      {CONTENT.productsTable.delete}
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
