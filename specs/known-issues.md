@@ -216,3 +216,48 @@ server log before the fix; `AUTH_URL=http://localhost:3000 bun run start`
 then returned `200` with body `null` and no error in the log. Confirmed
 `bun run dev` was unaffected before and after (dev's `NODE_ENV` auto-trust
 already masked this).
+
+## Missing Firestore composite index for order history/queue (fixed — first-deploy gotcha)
+
+**Priority: Was High locally, but same category as the `AUTH_URL` entry
+above** — this is a "you will hit this the first time a fresh Firestore
+project runs the order-management feature" note, not a code defect.
+
+**Affected area:** `GET /api/orders` (customer order history) via
+`listOrdersByUser` in `src/modules/orders/lib/orderRepository.ts`, which
+runs `.where("userId", "==", userId).orderBy("createdAt", "desc")`.
+
+**Symptom:** every request 500'd with `Failed to load orders`; the
+server log showed `FAILED_PRECONDITION: The query requires an index`,
+with a console link to create it.
+
+**Root cause:** an equality filter on one field (`userId`) combined with
+an `orderBy` on a different field (`createdAt`) needs a Firestore
+composite index — `specs/data-model.md`'s "Indexes anticipated" section
+already called this out (`orders: userId + createdAt`), but the index
+itself doesn't exist automatically; it has to be created per Firestore
+project, and this repo had no `firestore.indexes.json` for
+`firebase deploy --only firestore:indexes` to pick up, so the only way
+to create it was the console-link click-through.
+
+**Fix applied:** the index was created via the console link for the
+local dev Firestore project. `firestore.indexes.json` (and a minimal
+`firebase.json` pointing at it) were added to this repo so the same
+index is declarative and reproducible going forward.
+
+**Deploy note:** a **fresh** Firestore project (a new environment, or a
+teammate's own project) still needs this index created before
+`/orders` or a status-filtered `/admin/orders` query will work — either
+run `firebase deploy --only firestore:indexes` (now that
+`firestore.indexes.json`/`firebase.json` exist), or click through the
+console link Firestore prints in the server log the first time the
+query runs. Neither happens automatically on its own.
+
+**Verification:** placed a real order through Stripe test-mode checkout,
+confirmed `FAILED_PRECONDITION` before the index existed and a correct
+populated `/orders` response after; also confirmed the admin queue's
+`GET /api/admin/orders` (unfiltered, and status-filtered) work without
+needing this particular index, since that route deliberately sorts by
+`createdAt` in memory rather than chaining Firestore's `.orderBy()` onto
+a `status` filter, to avoid needing a second `status + createdAt`
+composite index beyond what `data-model.md` anticipated.

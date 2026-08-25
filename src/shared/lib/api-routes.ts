@@ -12,11 +12,16 @@ export const API_ROUTES = {
       update: (slug: string) => `/admin/products/${encodeURIComponent(slug)}`,
       images: (slug: string) => `/admin/products/${encodeURIComponent(slug)}/images`,
     },
+    orders: {
+      list: "/admin/orders",
+      updateStatus: (orderId: string) => `/admin/orders/${encodeURIComponent(orderId)}`,
+    },
   },
   checkout: {
     session: "/checkout/session",
   },
   orders: {
+    list: "/orders",
     detail: (orderId: string) => `/orders/${encodeURIComponent(orderId)}`,
   },
 } as const;

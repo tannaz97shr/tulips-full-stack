@@ -3,6 +3,7 @@ export const CONTENT = {
     heading: "Admin",
     nav: {
       products: "Products",
+      orders: "Orders",
     },
   },
   productsView: {
@@ -121,5 +122,32 @@ export const CONTENT = {
     heading: "Edit product",
     loading: "Loading product…",
     loadError: "We couldn't load this product.",
+  },
+  ordersView: {
+    heading: "Orders",
+    loading: "Loading…",
+    ordersCount: (count: number) => `${count} orders`,
+    loadError: "We couldn't load orders.",
+    emptyState: "No orders yet.",
+    emptyStateFiltered: "No orders match this filter.",
+    statusFilterPlaceholder: "All statuses",
+  },
+  ordersTable: {
+    columns: {
+      date: "Date",
+      customer: "Customer",
+      items: "Items",
+      total: "Total",
+      status: "Status",
+      actions: "",
+    },
+    itemsSummary: (count: number) => `${count} item${count === 1 ? "" : "s"}`,
+    updateStatusPlaceholder: "Change status…",
+    noActions: "—",
+    saveError: "Failed to update order status.",
+    cancelOrder: "Cancel order",
+    cancelConfirmTitle: "Cancel order?",
+    cancelConfirm: (orderId: string) => `Cancel order ${orderId}? This can't be undone.`,
+    cancel: "Cancel",
   },
 } as const;

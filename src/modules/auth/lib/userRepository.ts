@@ -59,3 +59,23 @@ export async function findOrCreateGoogleUser(input: { email: string; name: strin
   const doc = await ref.get();
   return toSessionUser(doc);
 }
+
+/**
+ * Batch-fetches users by id for the admin order queue's customer join.
+ * No `getAll`/`documentId() "in"` batch-read helper exists elsewhere in
+ * this repo — mirrors `settleOrder`'s `Promise.all` of individual
+ * `.doc(id).get()` calls instead of introducing a new pattern. Ids with no
+ * matching (or deleted) user doc are simply absent from the returned map.
+ */
+export async function getUsersByIds(userIds: string[]): Promise<Map<string, SessionUser>> {
+  const uniqueIds = [...new Set(userIds)];
+  const snapshots = await Promise.all(uniqueIds.map((id) => usersCollection().doc(id).get()));
+
+  const usersById = new Map<string, SessionUser>();
+  snapshots.forEach((snapshot, index) => {
+    if (snapshot.exists) {
+      usersById.set(uniqueIds[index], toSessionUser(snapshot));
+    }
+  });
+  return usersById;
+}

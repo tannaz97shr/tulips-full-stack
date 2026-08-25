@@ -2,6 +2,7 @@ import { apiClient } from "@/shared/lib/api-client";
 import { API_ROUTES } from "@/shared/lib/api-routes";
 import type { Product } from "@/modules/catalog/types";
 import type { ProductWriteInput } from "@/modules/admin/lib/schemas";
+import type { AdminOrdersListResponse, Order, OrderStatus } from "@/modules/orders/types";
 
 export async function createProduct(input: ProductWriteInput): Promise<Product> {
   const { data } = await apiClient.post<{ product: Product }>(API_ROUTES.admin.products.create, input);
@@ -41,4 +42,22 @@ export async function reorderProductImages(
     primaryImageIndex,
   });
   return data.product;
+}
+
+export interface AdminOrdersParams {
+  status?: OrderStatus;
+  page?: number;
+  pageSize?: number;
+}
+
+export async function fetchAdminOrders(params: AdminOrdersParams): Promise<AdminOrdersListResponse> {
+  const { data } = await apiClient.get<AdminOrdersListResponse>(API_ROUTES.admin.orders.list, { params });
+  return data;
+}
+
+export async function updateOrderStatus(orderId: string, status: OrderStatus): Promise<Order> {
+  const { data } = await apiClient.patch<{ order: Order }>(API_ROUTES.admin.orders.updateStatus(orderId), {
+    status,
+  });
+  return data.order;
 }
