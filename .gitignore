@@ -43,3 +43,6 @@ next-env.d.ts
 
 # claude code
 .claude/settings.local.json
+
+# Claude Design
+design/Tulips Storefront.html

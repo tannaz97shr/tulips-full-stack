@@ -49,6 +49,7 @@ export interface ProductFilters {
   minPrice?: number;
   maxPrice?: number;
   inStockOnly?: boolean;
+  isFeatured?: boolean;
   excludeSlug?: string;
   search?: string;
   excludeComposite?: boolean;

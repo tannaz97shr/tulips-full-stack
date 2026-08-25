@@ -3,6 +3,7 @@ export const ROUTES = {
   products: {
     list: "/products",
     detail: (slug: string) => `/products/${slug}`,
+    byCategory: (category: string) => `/products?category=${encodeURIComponent(category)}`,
   },
   signIn: "/sign-in",
   signInWithCallback: (target: string) => `/sign-in?callbackUrl=${encodeURIComponent(target)}`,

@@ -47,12 +47,4 @@ export const CONTENT = {
     title: "Tulips — flowers & bouquets",
     description: "A portfolio demo of a flower and bouquet shop.",
   },
-  home: {
-    freshWeekly: "Fresh weekly",
-    heading: "Flowers that feel like home.",
-    subheading: "Hand-tied bouquets, potted greenery and gifts, arranged and delivered the same day.",
-    shopCta: "Shop the collection",
-    heroCaption: "hero photo — bouquet on a table",
-    categoriesHeading: "Shop by category",
-  },
 } as const;

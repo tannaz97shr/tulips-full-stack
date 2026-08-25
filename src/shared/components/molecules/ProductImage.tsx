@@ -7,12 +7,14 @@ interface ProductImageProps {
   alt: string;
   sizes: string;
   aspectRatio?: string;
-  rounded?: "sm" | "md" | "lg";
+  rounded?: "none" | "sm" | "md" | "lg";
   caption?: string;
   className?: string;
+  /** Fill an already-positioned parent (e.g. a full-bleed hero) instead of sizing via `aspectRatio`. */
+  fill?: boolean;
 }
 
-const roundedClasses = { sm: "rounded-sm", md: "rounded-md", lg: "rounded-lg" };
+const roundedClasses = { none: "", sm: "rounded-sm", md: "rounded-md", lg: "rounded-lg" };
 
 export function ProductImage({
   src,
@@ -22,13 +24,25 @@ export function ProductImage({
   rounded = "md",
   caption,
   className,
+  fill = false,
 }: ProductImageProps) {
   if (!src) {
-    return <PlaceholderImage aspectRatio={aspectRatio} rounded={rounded} caption={caption} className={className} />;
+    return (
+      <PlaceholderImage
+        aspectRatio={aspectRatio}
+        rounded={rounded}
+        caption={caption}
+        className={className}
+        fill={fill}
+      />
+    );
   }
 
   return (
-    <div className={cn("relative overflow-hidden", roundedClasses[rounded], className)} style={{ aspectRatio }}>
+    <div
+      className={cn("overflow-hidden", fill ? "absolute inset-0" : "relative", roundedClasses[rounded], className)}
+      style={fill ? undefined : { aspectRatio }}
+    >
       <Image src={src} alt={alt} fill sizes={sizes} className="object-cover" />
     </div>
   );

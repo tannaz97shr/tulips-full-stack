@@ -9,7 +9,6 @@ export * from "./components/layout/Header";
 export * from "./components/layout/MobileDrawer";
 export * from "./components/layout/SiteShell";
 export * from "./components/layout/ThemeToggle";
-export * from "./components/molecules/CategoryTile";
 export * from "./components/molecules/ChipMultiSelect";
 export * from "./components/molecules/ConfirmDialog";
 export * from "./components/molecules/Drawer";

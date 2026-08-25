@@ -27,6 +27,7 @@ export async function GET(request: Request) {
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
     const inStockOnly = searchParams.get("inStockOnly") === "true";
+    const isFeatured = searchParams.get("isFeatured") === "true";
     const excludeSlug = searchParams.get("excludeSlug");
     const search = searchParams.get("search");
     const excludeComposite = searchParams.get("excludeComposite") === "true";
@@ -69,6 +70,9 @@ export async function GET(request: Request) {
     }
     if (inStockOnly) {
       products = products.filter((product) => product.inStock);
+    }
+    if (isFeatured) {
+      products = products.filter((product) => product.isFeatured);
     }
     if (excludeSlug) {
       products = products.filter((product) => product.slug !== excludeSlug);

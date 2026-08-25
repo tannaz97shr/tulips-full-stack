@@ -1,48 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Project Status
 
-## Getting Started
+Tulips is a feature-complete portfolio project demonstrating a real,
+end-to-end e-commerce flow — not a mockup. Every acceptance criterion in
+`specs/acceptance-criteria.md` has been implemented and verified against
+real behavior: real Stripe test-mode payments, real webhook signature
+verification, real Firestore transactions, and real cross-account
+permission checks — not just typechecked or assumed to work.
 
-First, run the development server:
+**Built and verified:**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Product catalog with filtering, admin-curated bouquets (composite products)
+- Full admin CRUD: products, image galleries, bouquet builder, order queue
+- Cart & checkout with real Stripe Checkout Sessions (test mode)
+- Signature-verified, idempotent Stripe webhooks; atomic stock decrement
+  across standalone products and bouquet components
+- Customer order history + admin order management
+- Auth (email/password + Google), server-side route and API protection
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Known limitations
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Firestore composite indexes are declared, not auto-deployed.** A fresh
+  clone needs `firebase deploy --only firestore:indexes` (or a one-time
+  console click) before order history/queues will work — see
+  `firestore.indexes.json`.
+- **Password reset is unimplemented** — an open question in
+  `specs/authentication.md`, deliberately deferred rather than built for MVP.
+- **One intermittent, unreproduced bug** is documented in
+  `specs/known-issues.md` (an occasional bouquet-save validation flake) —
+  investigated thoroughly (17 automated trials, source-level tracing of
+  React Hook Form internals) but never reproduced after the initial report.
+- Admin tables aren't optimized for narrow mobile viewports (functional via
+  horizontal scroll, no visual affordance hinting at it yet).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Local Stripe webhook testing
-
-Checkout uses a signature-verified Stripe webhook (`app/api/webhooks/stripe/route.ts`) as the sole source of truth for payment status — the browser redirect after Stripe Checkout is never treated as proof of payment. To exercise that locally:
-
-1. Install the [Stripe CLI](https://stripe.com/docs/stripe-cli) and run `stripe login` once.
-2. In a separate terminal, forward events to your local dev server:
-   ```bash
-   stripe listen --forward-to localhost:3000/api/webhooks/stripe
-   ```
-3. Copy the `whsec_...` value the CLI prints into `STRIPE_WEBHOOK_SECRET` in `.env.local`.
-4. Complete a checkout in the app using a [Stripe test card](https://stripe.com/docs/testing) — the CLI forwards the real, signed event from that test-mode session to your local webhook route.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `specs/known-issues.md` for the full history of bugs found and fixed
+during development, including a genuinely nasty one: Stripe's webhook
+signature verification silently failed under Bun's runtime because of a
+sync-vs-async crypto provider mismatch — found and fixed via live
+reproduction against real signed Stripe events, not just code review.

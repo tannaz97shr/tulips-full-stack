@@ -25,6 +25,7 @@ function buildParams(filters: ProductFilters): URLSearchParams {
   if (filters.minPrice !== undefined) params.set("minPrice", String(filters.minPrice));
   if (filters.maxPrice !== undefined) params.set("maxPrice", String(filters.maxPrice));
   if (filters.inStockOnly) params.set("inStockOnly", "true");
+  if (filters.isFeatured) params.set("isFeatured", "true");
   if (filters.excludeSlug) params.set("excludeSlug", filters.excludeSlug);
   if (filters.search) params.set("search", filters.search);
   if (filters.excludeComposite) params.set("excludeComposite", "true");
