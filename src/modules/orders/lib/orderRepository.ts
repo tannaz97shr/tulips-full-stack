@@ -1,5 +1,5 @@
 import { FieldValue } from "firebase-admin/firestore";
-import type { DocumentSnapshot } from "firebase-admin/firestore";
+import type { DocumentData, DocumentSnapshot, Query } from "firebase-admin/firestore";
 import { getAdminFirestore } from "@/shared/lib/firebase-admin";
 import { toOrder } from "@/modules/orders/lib/toOrder";
 import type { DeliveryAddress, Order, OrderLineItem, OrderStatus } from "@/modules/orders/types";
@@ -50,6 +50,52 @@ export async function getOrderById(orderId: string): Promise<Order | null> {
   const db = getAdminFirestore();
   const doc = await db.collection("orders").doc(orderId).get();
   return doc.exists ? toOrder(doc) : null;
+}
+
+/** A customer's own order history, most recent first. */
+export async function listOrdersByUser(userId: string): Promise<Order[]> {
+  const db = getAdminFirestore();
+  const snapshot = await db
+    .collection("orders")
+    .where("userId", "==", userId)
+    .orderBy("createdAt", "desc")
+    .get();
+  return snapshot.docs.map(toOrder);
+}
+
+/**
+ * All orders for the admin queue, optionally narrowed to one status.
+ * Sorted here rather than via a Firestore `.orderBy("createdAt")` chained
+ * onto the status filter, since that combination would need a
+ * `status + createdAt` composite index beyond the single-field `status`
+ * index specs/data-model.md anticipates — an in-memory sort is fine at
+ * MVP scale (same tradeoff app/api/products/route.ts already makes for
+ * its secondary filters).
+ */
+export async function listOrders(status?: OrderStatus): Promise<Order[]> {
+  const db = getAdminFirestore();
+  let query: Query<DocumentData> = db.collection("orders");
+  if (status) {
+    query = query.where("status", "==", status);
+  }
+  const snapshot = await query.get();
+  const orders = snapshot.docs.map(toOrder);
+  return orders.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+/**
+ * Manual admin status update (Processing/Delivered/Cancelled). Never
+ * touches `processedStripeEventIds` or stock — `Paid`/`Failed` and stock
+ * decrements are exclusively `settleOrder`'s (webhook) responsibility.
+ * Callers are expected to have already verified the order isn't
+ * `Pending`/`Failed` before calling this.
+ */
+export async function updateOrderStatus(orderId: string, status: OrderStatus): Promise<Order> {
+  const db = getAdminFirestore();
+  const ref = db.collection("orders").doc(orderId);
+  await ref.update({ status, updatedAt: FieldValue.serverTimestamp() });
+  const doc = await ref.get();
+  return toOrder(doc);
 }
 
 interface OrderDoc {

@@ -34,4 +34,28 @@ export interface Order {
   status: OrderStatus;
   stripeSessionId?: string;
   stripePaymentIntentId?: string;
+  /** ISO 8601 timestamp. */
+  createdAt: string;
+}
+
+export interface OrdersListResponse {
+  orders: Order[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
+/** An `Order` enriched with customer identity for the admin queue — `Order` itself only stores `userId`. */
+export interface AdminOrder extends Order {
+  customerName: string;
+  customerEmail: string;
+}
+
+export interface AdminOrdersListResponse {
+  orders: AdminOrder[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
 }
