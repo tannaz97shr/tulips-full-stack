@@ -1,7 +1,13 @@
 import type Stripe from "stripe";
 import { getStripe } from "@/shared/lib/stripe";
 import { logError } from "@/shared/lib/log-error";
-import { settleOrder } from "@/modules/orders/lib/orderRepository";
+import {
+  settleOrder,
+  getOrderById,
+  markRefundPending,
+  markRefundSucceeded,
+  markRefundFailed,
+} from "@/modules/orders/lib/orderRepository";
 
 const PAID_EVENT_TYPES = new Set(["checkout.session.completed", "checkout.session.async_payment_succeeded"]);
 const FAILED_EVENT_TYPES = new Set(["checkout.session.async_payment_failed", "checkout.session.expired"]);
@@ -62,6 +68,36 @@ export async function POST(request: Request) {
     stripePaymentIntentId:
       typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id,
   });
+
+  if (
+    result.finalStatus === "Failed" &&
+    result.failureReason === "insufficient_stock" &&
+    result.stripePaymentIntentId
+  ) {
+    // Re-check durable order state, not just this event's result — a
+    // redelivered event must not re-attempt a refund that already
+    // succeeded. `stripe.refunds.create`'s idempotency key is defense in
+    // depth for the crash window between marking "pending" and "succeeded".
+    const currentOrder = await getOrderById(orderId);
+    if (currentOrder && currentOrder.refundStatus !== "succeeded") {
+      await markRefundPending(orderId);
+      try {
+        const refund = await getStripe().refunds.create(
+          { payment_intent: result.stripePaymentIntentId },
+          { idempotencyKey: `refund_${orderId}` }
+        );
+        await markRefundSucceeded(orderId, refund.id);
+      } catch (refundError) {
+        await markRefundFailed(orderId);
+        logError(refundError, {
+          route: "POST /api/webhooks/stripe",
+          orderId,
+          paymentIntentId: result.stripePaymentIntentId,
+          eventId: event.id,
+        });
+      }
+    }
+  }
 
   if (result.finalStatus === "Failed") {
     logError(new Error("Order failed"), {

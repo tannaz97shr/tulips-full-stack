@@ -88,10 +88,20 @@ export function OrderConfirmationView({ orderId }: OrderConfirmationViewProps) {
   }
 
   if (order.status === "Failed" && cameFromCheckout) {
+    const wasChargedAndRefunded =
+      order.failureReason === "insufficient_stock" && order.refundStatus === "succeeded";
     return (
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-md px-lg py-2xl text-center">
-        <h1 className="text-2xl">{CONTENT.orderConfirmationView.failedHeading}</h1>
-        <p className="text-base text-foreground/70">{CONTENT.orderConfirmationView.failedDetail}</p>
+        <h1 className="text-2xl">
+          {wasChargedAndRefunded
+            ? CONTENT.orderConfirmationView.failedRefundedHeading
+            : CONTENT.orderConfirmationView.failedHeading}
+        </h1>
+        <p className="text-base text-foreground/70">
+          {wasChargedAndRefunded
+            ? CONTENT.orderConfirmationView.failedRefundedDetail
+            : CONTENT.orderConfirmationView.failedDetail}
+        </p>
         <Button href={ROUTES.checkout}>{CONTENT.orderConfirmationView.tryAgain}</Button>
       </div>
     );

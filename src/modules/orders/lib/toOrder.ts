@@ -25,6 +25,9 @@ export function toOrder(doc: QueryDocumentSnapshot | DocumentSnapshot): Order {
     status: data.status,
     stripeSessionId: data.stripeSessionId,
     stripePaymentIntentId: data.stripePaymentIntentId,
+    failureReason: data.failureReason,
+    refundStatus: data.refundStatus,
+    stripeRefundId: data.stripeRefundId,
     createdAt: data.createdAt.toDate().toISOString(),
   };
 }

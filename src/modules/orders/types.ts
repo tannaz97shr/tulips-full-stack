@@ -34,6 +34,9 @@ export interface Order {
   status: OrderStatus;
   stripeSessionId?: string;
   stripePaymentIntentId?: string;
+  failureReason?: "payment_failed" | "insufficient_stock";
+  refundStatus?: "pending" | "succeeded" | "failed";
+  stripeRefundId?: string;
   /** ISO 8601 timestamp. */
   createdAt: string;
 }

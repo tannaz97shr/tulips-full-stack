@@ -42,6 +42,32 @@ export async function markOrderFailed(orderId: string): Promise<void> {
   const db = getAdminFirestore();
   await db.collection("orders").doc(orderId).update({
     status: "Failed",
+    failureReason: "payment_failed",
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+}
+
+export async function markRefundPending(orderId: string): Promise<void> {
+  const db = getAdminFirestore();
+  await db.collection("orders").doc(orderId).update({
+    refundStatus: "pending",
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+}
+
+export async function markRefundSucceeded(orderId: string, stripeRefundId: string): Promise<void> {
+  const db = getAdminFirestore();
+  await db.collection("orders").doc(orderId).update({
+    refundStatus: "succeeded",
+    stripeRefundId,
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+}
+
+export async function markRefundFailed(orderId: string): Promise<void> {
+  const db = getAdminFirestore();
+  await db.collection("orders").doc(orderId).update({
+    refundStatus: "failed",
     updatedAt: FieldValue.serverTimestamp(),
   });
 }
@@ -121,6 +147,8 @@ interface SettleOrderResult {
   /** False when the event was a no-op — order not found, already processed, or the order was already resolved by an earlier event. */
   settled: boolean;
   finalStatus: OrderStatus | null;
+  failureReason?: "payment_failed" | "insufficient_stock";
+  stripePaymentIntentId?: string;
 }
 
 /**
@@ -176,10 +204,11 @@ export async function settleOrder({
     if (outcome === "failed") {
       tx.update(orderRef, {
         status: "Failed",
+        failureReason: "payment_failed",
         processedStripeEventIds: FieldValue.arrayUnion(eventId),
         updatedAt: FieldValue.serverTimestamp(),
       });
-      return { settled: true, finalStatus: "Failed" };
+      return { settled: true, finalStatus: "Failed", failureReason: "payment_failed" };
     }
 
     const decrementMap = new Map<string, number>();
@@ -217,10 +246,17 @@ export async function settleOrder({
     if (!sufficientStock) {
       tx.update(orderRef, {
         status: "Failed",
+        failureReason: "insufficient_stock",
+        ...(stripePaymentIntentId ? { stripePaymentIntentId } : {}),
         processedStripeEventIds: FieldValue.arrayUnion(eventId),
         updatedAt: FieldValue.serverTimestamp(),
       });
-      return { settled: true, finalStatus: "Failed" };
+      return {
+        settled: true,
+        finalStatus: "Failed",
+        failureReason: "insufficient_stock",
+        stripePaymentIntentId,
+      };
     }
 
     decrementMap.forEach((qty, productId) => {
@@ -240,6 +276,6 @@ export async function settleOrder({
       processedStripeEventIds: FieldValue.arrayUnion(eventId),
       updatedAt: FieldValue.serverTimestamp(),
     });
-    return { settled: true, finalStatus: "Paid" };
+    return { settled: true, finalStatus: "Paid", stripePaymentIntentId };
   });
 }

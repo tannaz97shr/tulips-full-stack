@@ -9,6 +9,9 @@ export const CONTENT = {
     paidDetail: (orderId: string) => `Order ${orderId} is confirmed.`,
     failedHeading: "We couldn't confirm this payment.",
     failedDetail: "If you were charged, please contact us — otherwise, feel free to try again.",
+    failedRefundedHeading: "We couldn't complete this order.",
+    failedRefundedDetail:
+      "One or more items sold out before we could confirm it. You were charged, and we've refunded you in full.",
     orderHeading: (orderId: string) => `Order ${orderId}`,
     backToShop: "Back to shop",
     backToOrders: "Back to your orders",
