@@ -27,10 +27,17 @@ export interface Order {
   deliveryAddress: DeliveryAddress;
   /** Calendar date, YYYY-MM-DD. */
   deliveryDate: string;
-  /** AUD, minor units (cents). */
+  /**
+   * AUD, minor units (cents). For `gstInclusive` orders: `subtotal === total`
+   * (sum of GST-inclusive item prices) and `tax` is the GST contained in the
+   * total (total ÷ 11). Older orders without the flag were charged
+   * `subtotal + tax = total`, with GST added on top.
+   */
   subtotal: number;
   tax: number;
   total: number;
+  /** `true` for orders priced GST-inclusive; absent on orders created before that change. */
+  gstInclusive?: boolean;
   status: OrderStatus;
   stripeSessionId?: string;
   stripePaymentIntentId?: string;

@@ -27,8 +27,10 @@ export const CONTENT = {
     loadError: "We couldn't load this product.",
     breadcrumbHome: "Home",
     breadcrumbShop: "Shop",
-    imageCaption: (index: number, name: string) => `Image ${index} of 4 — ${name}`,
-    colorPrefix: "Color: ",
+    imageCaption: (index: number, total: number, name: string) =>
+      total > 1 ? `Image ${index} of ${total} — ${name}` : name,
+    showImage: (index: number, total: number) => `Show image ${index} of ${total}`,
+    colours: (values: readonly string[]) => `${values.length === 1 ? "Colour" : "Colours"}: ${values.join(", ")}`,
     addToCart: "Add to cart",
     toggleWishlist: "Toggle wishlist",
   },

@@ -5,7 +5,8 @@ export const CONTENT = {
     empty: "Your cart is empty.",
     continueShopping: "Continue shopping",
     remove: "Remove",
-    subtotal: "Subtotal",
+    total: "Total",
+    includesGst: (amount: string) => `Includes GST of ${amount}`,
     checkout: "Checkout",
   },
   addToCart: {

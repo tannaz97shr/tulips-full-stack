@@ -51,7 +51,7 @@ export const CONTENT = {
     season: "Season",
     tags: "Tags",
     isFeatured: "Featured",
-    priceDollars: "Price (AUD)",
+    priceDollars: "Price (AUD, incl. GST)",
     stockCount: "Stock count",
   },
   validation: {

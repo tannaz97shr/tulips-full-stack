@@ -49,7 +49,8 @@ other products).
 | recipientName | string | |
 | deliveryAddress | object | |
 | deliveryDate | date | |
-| subtotal / tax / total | number | |
+| subtotal / tax / total | number | AUD cents. For `gstInclusive` orders: `subtotal = total` (sum of GST-inclusive item prices) and `tax` = GST contained in the total (total ÷ 11). Older orders without the flag were charged `subtotal + tax = total` and keep that breakdown on receipts |
+| gstInclusive | boolean | `true` on orders priced GST-inclusive; absent on orders created before that change |
 | status | enum | Pending / Paid / Processing / Delivered / Cancelled / Failed |
 | stripeSessionId | string | |
 | stripePaymentIntentId | string | |

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Static design mockups (not app code) — pre-existing lint errors, out of scope.
+    "design/**",
   ]),
 ]);
 

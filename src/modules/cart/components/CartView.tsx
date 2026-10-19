@@ -5,6 +5,7 @@ import { ROUTES } from "@/shared/routes";
 import { formatPrice } from "@/shared/utils/formatPrice";
 import { CONTENT } from "@/modules/cart/content";
 import { useCart } from "@/modules/cart/hooks/useCart";
+import { gstIncluded } from "@/modules/checkout/lib/pricing";
 import { CartLineItemRow } from "./CartLineItemRow";
 
 export function CartView() {
@@ -28,9 +29,12 @@ export function CartView() {
         ))}
       </div>
       <div className="mt-lg flex items-center justify-between">
-        <span className="text-lg text-foreground/70">{CONTENT.cartView.subtotal}</span>
+        <span className="text-lg text-foreground/70">{CONTENT.cartView.total}</span>
         <span className="font-heading text-2xl text-accent-700">{formatPrice(subtotal)}</span>
       </div>
+      <p className="mt-1 text-right text-sm text-foreground/70">
+        {CONTENT.cartView.includesGst(formatPrice(gstIncluded(subtotal)))}
+      </p>
       <Button href={ROUTES.checkout} variant="primary" block className="mt-lg">
         {CONTENT.cartView.checkout}
       </Button>

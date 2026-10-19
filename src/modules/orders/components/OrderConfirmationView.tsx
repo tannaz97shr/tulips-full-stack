@@ -48,14 +48,14 @@ export function OrderConfirmationView({ orderId }: OrderConfirmationViewProps) {
     const notFound = isAxiosError(error) && error.response?.status === 404;
     if (notFound) {
       return (
-        <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-md px-lg text-center">
+        <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-md px-lg text-center">
           <p className="text-lg text-foreground/70">{CONTENT.orderConfirmationView.notFound}</p>
           <Button href={ROUTES.products.list}>{CONTENT.orderConfirmationView.backToShop}</Button>
         </div>
       );
     }
     return (
-      <div className="mx-auto w-full max-w-2xl px-lg py-lg">
+      <div className="mx-auto w-full max-w-3xl px-lg py-lg">
         <ErrorState message={CONTENT.orderConfirmationView.loadError} onRetry={() => refetch()} />
       </div>
     );
@@ -68,7 +68,7 @@ export function OrderConfirmationView({ orderId }: OrderConfirmationViewProps) {
   if (order.status === "Pending") {
     if (cameFromCheckout) {
       return (
-        <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-md px-lg py-2xl text-center">
+        <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-md px-lg py-2xl text-center">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-foreground/20 border-t-accent" />
           <h1 className="text-2xl">{CONTENT.orderConfirmationView.pending}</h1>
           <p className="text-base text-foreground/70">{CONTENT.orderConfirmationView.pendingDetail}</p>
@@ -79,7 +79,7 @@ export function OrderConfirmationView({ orderId }: OrderConfirmationViewProps) {
     // checkout redirect — nothing is actively resolving this in the
     // background, so an indefinite spinner would just strand the customer.
     return (
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-md px-lg py-2xl text-center">
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-md px-lg py-2xl text-center">
         <h1 className="text-2xl">{CONTENT.orderConfirmationView.stillProcessingHeading}</h1>
         <p className="text-base text-foreground/70">{CONTENT.orderConfirmationView.stillProcessingDetail}</p>
         <Button href={ROUTES.orders}>{CONTENT.orderConfirmationView.backToOrders}</Button>
@@ -91,7 +91,7 @@ export function OrderConfirmationView({ orderId }: OrderConfirmationViewProps) {
     const wasChargedAndRefunded =
       order.failureReason === "insufficient_stock" && order.refundStatus === "succeeded";
     return (
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-md px-lg py-2xl text-center">
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-md px-lg py-2xl text-center">
         <h1 className="text-2xl">
           {wasChargedAndRefunded
             ? CONTENT.orderConfirmationView.failedRefundedHeading
@@ -114,7 +114,7 @@ export function OrderConfirmationView({ orderId }: OrderConfirmationViewProps) {
   const justPaid = cameFromCheckout && order.status === "Paid";
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center gap-md px-lg py-2xl text-center">
+    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center gap-md px-lg py-2xl text-center">
       {justPaid ? (
         <>
           <h1 className="text-2xl">{CONTENT.orderConfirmationView.paidHeading}</h1>

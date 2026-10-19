@@ -3,10 +3,12 @@ import { getStripe } from "@/shared/lib/stripe";
 import { logError } from "@/shared/lib/log-error";
 import { requireSession } from "@/modules/auth/lib/requireSession";
 import { checkoutSchema } from "@/modules/checkout/lib/schemas";
-import { calculateTax } from "@/modules/checkout/lib/pricing";
+import { gstIncluded, sumLineItems } from "@/modules/checkout/lib/pricing";
 import { createPendingOrder, attachStripeSessionId, markOrderFailed } from "@/modules/orders/lib/orderRepository";
 import type { OrderLineItem } from "@/modules/orders/types";
 import { ROUTES } from "@/shared/routes";
+import { formatPrice } from "@/shared/utils/formatPrice";
+import { CONTENT as CHECKOUT_CONTENT } from "@/modules/checkout/content";
 
 interface ProductSnapshotDoc {
   name: string;
@@ -58,9 +60,10 @@ export async function POST(request: Request) {
       return Response.json({ error: "Some items are no longer available", unavailable }, { status: 409 });
     }
 
-    const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const tax = calculateTax(subtotal);
-    const total = subtotal + tax;
+    // Prices are GST-inclusive (Australian retail): the total is the sum of
+    // the items, and GST is the component already inside it — never added on top.
+    const total = sumLineItems(orderItems);
+    const gst = gstIncluded(total);
 
     const order = await createPendingOrder({
       userId: session.user.id,
@@ -68,9 +71,10 @@ export async function POST(request: Request) {
       recipientName,
       deliveryAddress,
       deliveryDate,
-      subtotal,
-      tax,
+      subtotal: total,
+      tax: gst,
       total,
+      gstInclusive: true,
     });
 
     const origin = new URL(request.url).origin;
@@ -82,24 +86,17 @@ export async function POST(request: Request) {
         currency: "aud",
         client_reference_id: order.id,
         metadata: { orderId: order.id },
-        line_items: [
-          ...orderItems.map((item) => ({
-            price_data: {
-              currency: "aud",
-              product_data: { name: item.name },
-              unit_amount: item.price,
-            },
-            quantity: item.quantity,
-          })),
-          {
-            price_data: {
-              currency: "aud",
-              product_data: { name: "GST" },
-              unit_amount: tax,
-            },
-            quantity: 1,
+        line_items: orderItems.map((item) => ({
+          price_data: {
+            currency: "aud",
+            product_data: { name: item.name },
+            unit_amount: item.price,
           },
-        ],
+          quantity: item.quantity,
+        })),
+        custom_text: {
+          submit: { message: CHECKOUT_CONTENT.stripe.includesGst(formatPrice(gst)) },
+        },
         success_url: `${origin}${ROUTES.orders}/${order.id}?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}${ROUTES.checkout}`,
       });

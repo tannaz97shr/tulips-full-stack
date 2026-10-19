@@ -2,6 +2,9 @@
 
 /* Design tokens that don't change between light/dark */
 @theme {
+  /* Careful: Tailwind 4 resolves sizing utilities against --spacing-* before
+     --container-*, so these names shadow max-w-xs/sm/md/lg/xl/2xl (e.g.
+     max-w-2xl becomes 35.2px). Use max-w-3xl and up, or an arbitrary value. */
   --spacing-xs: 4.4px;
   --spacing-sm: 8.8px;
   --spacing-md: 13.2px;
