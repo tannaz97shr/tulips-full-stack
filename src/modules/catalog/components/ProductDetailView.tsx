@@ -8,7 +8,6 @@ import { Tag } from "@/shared/components/atoms/Tag";
 import { HeartIcon } from "@/shared/components/icons";
 import { ErrorState } from "@/shared/components/molecules/ErrorState";
 import { LoadingState } from "@/shared/components/molecules/LoadingState";
-import { PlaceholderImage } from "@/shared/components/molecules/PlaceholderImage";
 import { ProductCard } from "@/shared/components/molecules/ProductCard";
 import { ProductImage } from "@/shared/components/molecules/ProductImage";
 import { QuantityStepper } from "@/shared/components/molecules/QuantityStepper";
@@ -20,6 +19,8 @@ import { useCart } from "@/modules/cart/hooks/useCart";
 import { CONTENT } from "@/modules/catalog/content";
 import { useProduct } from "@/modules/catalog/hooks/useProduct";
 import { useProducts } from "@/modules/catalog/hooks/useProducts";
+import { COLORS } from "@/modules/catalog/constants";
+import { normalizeTaxonomyValues } from "@/modules/catalog/lib/normalizeTaxonomyValue";
 import type { Product } from "@/modules/catalog/types";
 
 interface ProductDetailViewProps {
@@ -44,7 +45,7 @@ function RelatedProducts({ related }: { related: Product[] }) {
 }
 
 export function ProductDetailView({ slug }: ProductDetailViewProps) {
-  const [activeImage, setActiveImage] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<number | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [liked, setLiked] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
@@ -83,6 +84,13 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
     return null;
   }
 
+  const images = product.images;
+  const primaryIndex = product.primaryImageIndex < images.length ? product.primaryImageIndex : 0;
+  // Until the customer picks a thumbnail, show the admin-chosen primary image.
+  const activeIndex = selectedImage !== null && selectedImage < images.length ? selectedImage : primaryIndex;
+  const hasThumbnails = images.length > 1;
+  const colours = normalizeTaxonomyValues(product.colors, COLORS);
+
   function handleAddToCart() {
     if (!product) return;
     addItem(
@@ -90,7 +98,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
         productId: product.id,
         name: product.name,
         price: product.price,
-        image: product.images[product.primaryImageIndex],
+        image: images[primaryIndex],
         maxStock: product.stockCount,
       },
       quantity
@@ -108,28 +116,33 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-xl md:grid-cols-2">
-        <div className="grid grid-cols-1 gap-md md:grid-cols-[76px_1fr]">
-          <div className="flex flex-row gap-sm md:flex-col">
-            {[0, 1, 2, 3].map((index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => setActiveImage(index)}
-                className={`h-16 w-16 flex-none overflow-hidden rounded-sm border-2 ${
-                  activeImage === index ? "border-accent" : "border-transparent"
-                }`}
-              >
-                <PlaceholderImage aspectRatio="1/1" rounded="sm" />
-              </button>
-            ))}
-          </div>
+        <div className={`grid grid-cols-1 gap-md ${hasThumbnails ? "md:grid-cols-[76px_1fr]" : ""}`}>
+          {hasThumbnails ? (
+            <div className="order-2 flex flex-row flex-wrap gap-sm md:order-1 md:flex-col">
+              {images.map((src, index) => (
+                <button
+                  key={src}
+                  type="button"
+                  onClick={() => setSelectedImage(index)}
+                  aria-label={CONTENT.productDetailView.showImage(index + 1, images.length)}
+                  aria-pressed={activeIndex === index}
+                  className={`h-16 w-16 flex-none overflow-hidden rounded-sm border-2 ${
+                    activeIndex === index ? "border-accent" : "border-transparent"
+                  }`}
+                >
+                  <ProductImage src={src} alt="" sizes="64px" aspectRatio="1/1" rounded="none" />
+                </button>
+              ))}
+            </div>
+          ) : null}
           <ProductImage
-            src={product.images[product.primaryImageIndex]}
+            src={images[activeIndex]}
             alt={product.name}
             sizes="(max-width: 768px) 100vw, 50vw"
             aspectRatio="4/5"
             rounded="lg"
-            caption={CONTENT.productDetailView.imageCaption(activeImage + 1, product.name)}
+            caption={CONTENT.productDetailView.imageCaption(activeIndex + 1, images.length, product.name)}
+            className={hasThumbnails ? "order-1 md:order-2" : undefined}
           />
         </div>
 
@@ -146,10 +159,9 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
             </Tag>
           ) : null}
           <p className="max-w-[52ch] text-lg text-foreground/85">{product.description}</p>
-          {product.colors[0] ? (
+          {colours.length > 0 ? (
             <Tag variant="outline" className="self-start">
-              {CONTENT.productDetailView.colorPrefix}
-              {product.colors[0]}
+              {CONTENT.productDetailView.colours(colours)}
             </Tag>
           ) : null}
           <div className="mt-sm flex items-center gap-md">

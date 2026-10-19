@@ -5,7 +5,12 @@
 - Currency: AUD
 - Stripe Checkout, **test mode**, real integration (not mocked)
 - Shipping: flat/free rate for MVP — no live courier-rate API
-- Tax: shown as a line item, calculated at a fixed rate — no real tax API
+- Tax: prices are **GST-inclusive** (Australian retail). Listed prices already
+  contain 10% GST; the order total is the sum of the items, and the GST
+  component is shown as "Includes GST of $X" (total ÷ 11, rounded to whole
+  cents) — never added on top or charged as a separate line item. Fixed
+  rate, no real tax API. Stripe Checkout shows the same note via the
+  session's `custom_text`.
 
 ## Flow
 1. Customer completes cart, then provides recipient name, delivery

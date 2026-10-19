@@ -15,7 +15,7 @@
 - `bun run build` — production build
 - `bun run start` — run a production build
 - `bun run lint` — ESLint
-- No test script exists yet — don't assume one when verifying changes.
+- `bun run test` — unit tests (`bun test`, files named `*.test.ts` next to the code they cover)
 
 ## Architecture
 - Routing lives in `app/` (App Router segments).

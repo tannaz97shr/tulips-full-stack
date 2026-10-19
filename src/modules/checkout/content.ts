@@ -3,7 +3,7 @@ export const CONTENT = {
     heading: "Checkout",
     summaryHeading: "Order summary",
     subtotal: "Subtotal",
-    tax: "GST",
+    includesGst: (amount: string) => `Includes GST of ${amount}`,
     shipping: "Shipping",
     free: "Free",
     total: "Total",
@@ -15,6 +15,9 @@ export const CONTENT = {
     validationError: "Please fix the highlighted fields and try again.",
     outOfStockError: "Some items in your cart are no longer available in the quantity requested. Please review your cart.",
   },
+  stripe: {
+    includesGst: (amount: string) => `Total includes GST of ${amount}.`,
+  },
   fields: {
     recipientName: "Recipient name",
     line1: "Address line 1",
@@ -23,6 +26,7 @@ export const CONTENT = {
     state: "State",
     postcode: "Postcode",
     deliveryDate: "Delivery date",
+    deliveryDatePicker: "Choose delivery date from calendar",
   },
   validation: {
     recipientNameRequired: "Recipient name is required.",
@@ -30,6 +34,7 @@ export const CONTENT = {
     suburbRequired: "Suburb is required.",
     stateRequired: "State is required.",
     postcodeInvalid: "Enter a valid 4-digit postcode.",
+    deliveryDateFormat: "Enter the date as dd/mm/yyyy.",
     deliveryDateInvalid: "Choose today or a future date.",
     itemsRequired: "Your cart is empty.",
   },

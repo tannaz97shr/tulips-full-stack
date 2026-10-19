@@ -22,6 +22,7 @@ export function toOrder(doc: QueryDocumentSnapshot | DocumentSnapshot): Order {
     subtotal: data.subtotal,
     tax: data.tax,
     total: data.total,
+    gstInclusive: data.gstInclusive,
     status: data.status,
     stripeSessionId: data.stripeSessionId,
     stripePaymentIntentId: data.stripePaymentIntentId,

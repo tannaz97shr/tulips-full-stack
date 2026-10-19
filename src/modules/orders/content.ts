@@ -29,6 +29,7 @@ export const CONTENT = {
     subtotal: "Subtotal",
     tax: "GST",
     total: "Total",
+    includesGst: (amount: string) => `Includes GST of ${amount}`,
   },
   orderHistoryView: {
     heading: "Your orders",

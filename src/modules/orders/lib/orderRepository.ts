@@ -14,6 +14,7 @@ interface CreatePendingOrderInput {
   subtotal: number;
   tax: number;
   total: number;
+  gstInclusive: true;
 }
 
 export async function createPendingOrder(input: CreatePendingOrderInput): Promise<Order> {

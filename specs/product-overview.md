@@ -39,7 +39,7 @@ Two roles: **Customer** and **Admin**. See `user-roles.md`.
   in MVP
 - Real transactional emails (order confirmation, etc.)
 - Real courier / live shipping-rate integration
-- Real tax-API integration (fixed-rate tax line item only in MVP)
+- Real tax-API integration (fixed-rate, GST-inclusive pricing only in MVP)
 - Additional staff role distinct from Admin
 - Admin audit logging
 

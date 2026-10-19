@@ -5,6 +5,9 @@
  *
  * Run with: bun run scripts/seed-products.ts
  * (Bun auto-loads .env.local; do not run with plain `node`.)
+ *
+ * WARNING: uses batch.set() keyed by slug, so re-running it OVERWRITES the
+ * live docs for these slugs (including admin edits and uploaded images).
  */
 import { FieldValue } from "firebase-admin/firestore";
 
@@ -147,7 +150,8 @@ const PRODUCTS: SeedProduct[] = [
   seedProduct({
     slug: "rose-lily-wedding-bouquet",
     name: "Rose & Lily Wedding Bouquet",
-    description: "An admin-curated bouquet pairing red roses with white lilies, built for weddings and anniversaries.",
+    description:
+      "Twelve long-stemmed red roses and six white lilies, hand-tied into a generous bouquet for weddings, anniversaries and other big days.",
     sku: "SKU-ROSE-LILY-WEDDING-BOUQUET",
     category: "Bouquets",
     isComposite: true,

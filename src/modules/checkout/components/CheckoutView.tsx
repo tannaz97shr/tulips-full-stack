@@ -6,19 +6,17 @@ import { isAxiosError } from "axios";
 import { useState } from "react";
 import { Button } from "@/shared/components/atoms/Button";
 import { Input } from "@/shared/components/atoms/Input";
+import { DateInput } from "@/shared/components/molecules/DateInput";
 import { FormField } from "@/shared/components/molecules/FormField";
+import { parseDisplayDate, todayIso } from "@/shared/utils/calendarDate";
 import { ROUTES } from "@/shared/routes";
 import { formatPrice } from "@/shared/utils/formatPrice";
 import { logError } from "@/shared/lib/log-error";
 import { CONTENT } from "@/modules/checkout/content";
-import { checkoutSchema, type CheckoutFormInput } from "@/modules/checkout/lib/schemas";
-import { calculateTax } from "@/modules/checkout/lib/pricing";
+import { checkoutDetailsFormSchema, type CheckoutDetailsFormInput } from "@/modules/checkout/lib/schemas";
+import { gstIncluded } from "@/modules/checkout/lib/pricing";
 import { useCreateCheckoutSession } from "@/modules/checkout/hooks/useCreateCheckoutSession";
 import { useCart } from "@/modules/cart/hooks/useCart";
-
-type CheckoutDetailsInput = Omit<CheckoutFormInput, "items">;
-
-const detailsSchema = checkoutSchema.omit({ items: true });
 
 export function CheckoutView() {
   const { items, subtotal } = useCart();
@@ -28,9 +26,10 @@ export function CheckoutView() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
-  } = useForm<CheckoutDetailsInput>({
-    resolver: zodResolver(detailsSchema),
+  } = useForm<CheckoutDetailsFormInput>({
+    resolver: zodResolver(checkoutDetailsFormSchema),
     defaultValues: {
       recipientName: "",
       deliveryAddress: { line1: "", line2: "", suburb: "", state: "", postcode: "", country: "AU" },
@@ -38,14 +37,19 @@ export function CheckoutView() {
     },
   });
 
-  const tax = calculateTax(subtotal);
-  const total = subtotal + tax;
+  // GST-inclusive pricing: the total is the cart sum; GST is shown as the
+  // component it contains, never added on top.
+  const total = subtotal;
+  const gst = gstIncluded(total);
 
-  async function onSubmit(values: CheckoutDetailsInput) {
+  async function onSubmit(values: CheckoutDetailsFormInput) {
     setFormError(null);
+    // Already validated by the form schema, so this always parses.
+    const deliveryDate = parseDisplayDate(values.deliveryDate) ?? values.deliveryDate;
     try {
       const { url } = await createSession.mutateAsync({
         ...values,
+        deliveryDate,
         items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
       });
       window.location.assign(url);
@@ -98,7 +102,16 @@ export function CheckoutView() {
             {(id) => <Input id={id} type="text" inputMode="numeric" {...register("deliveryAddress.postcode")} />}
           </FormField>
           <FormField label={CONTENT.fields.deliveryDate} error={errors.deliveryDate?.message}>
-            {(id) => <Input id={id} type="date" {...register("deliveryDate")} />}
+            {(id) => (
+              <DateInput
+                {...register("deliveryDate")}
+                id={id}
+                min={todayIso()}
+                pickerLabel={CONTENT.fields.deliveryDatePicker}
+                aria-invalid={errors.deliveryDate ? true : undefined}
+                onPick={(display) => setValue("deliveryDate", display, { shouldValidate: true, shouldDirty: true })}
+              />
+            )}
           </FormField>
           {formError ? (
             <p className="text-base text-accent-700" role="alert">
@@ -116,10 +129,6 @@ export function CheckoutView() {
             <span>{formatPrice(subtotal)}</span>
           </div>
           <div className="flex justify-between text-base">
-            <span className="text-foreground/70">{CONTENT.checkoutView.tax}</span>
-            <span>{formatPrice(tax)}</span>
-          </div>
-          <div className="flex justify-between text-base">
             <span className="text-foreground/70">{CONTENT.checkoutView.shipping}</span>
             <span>{CONTENT.checkoutView.free}</span>
           </div>
@@ -127,6 +136,7 @@ export function CheckoutView() {
             <span>{CONTENT.checkoutView.total}</span>
             <span className="text-accent-700">{formatPrice(total)}</span>
           </div>
+          <p className="text-right text-sm text-foreground/70">{CONTENT.checkoutView.includesGst(formatPrice(gst))}</p>
         </div>
       </div>
     </div>
